@@ -186,15 +186,72 @@
             font-size: 16px;
             margin-bottom: 15px;
         }
+
+        /* 개선: 메시지 입력 영역 */
+        .message-input-wrapper {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
         
         .message-input {
-            width: 100%;
+            flex: 1;
             padding: 12px;
             border: 2px solid #f5a623;
             border-radius: 8px;
             font-size: 14px;
-            margin-bottom: 10px;
             font-family: inherit;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: #ff9800;
+            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1);
+        }
+
+        .submit-message-btn {
+            padding: 12px 20px;
+            background: #f5a623;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .submit-message-btn:hover {
+            background: #ff9800;
+            transform: translateX(0) scale(1.05);
+        }
+
+        .submit-message-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 등록 성공 메시지 */
+        .success-message {
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
         }
         
         .message-list {
@@ -211,12 +268,18 @@
             font-size: 13px;
             color: #555;
             border-left: 3px solid #f5a623;
+            animation: fadeIn 0.3s ease;
         }
         
         .message-time {
             font-size: 11px;
             color: #999;
             margin-top: 3px;
+        }
+
+        .message-item.new {
+            background: #fffbf0;
+            border-left: 3px solid #ff9800;
         }
         
         .prescription {
@@ -265,7 +328,7 @@
             font-weight: bold;
         }
         
-        .reset-btn, .submit-btn {
+        .reset-btn {
             width: 100%;
             background: #667eea;
             color: white;
@@ -275,7 +338,7 @@
             margin-top: 15px;
         }
         
-        .reset-btn:hover, .submit-btn:hover {
+        .reset-btn:hover {
             background: #764ba2;
             transform: translateX(0) scale(1.02);
         }
@@ -345,14 +408,28 @@
                 </div>
             </div>
 
-            <!-- 익명 메시지 섹션 -->
+            <!-- 개선된 익명 메시지 섹션 -->
             <div class="messages-section">
                 <h3>💬 익명의 한마디 (선택)</h3>
-                <input type="text" 
-                       class="message-input" 
-                       id="anonymousMessage" 
-                       placeholder="오늘 기분이 어떤지 한 줄로... (최대 50자)"
-                       maxlength="50">
+                
+                <!-- 성공 메시지 -->
+                <div id="successMessage" class="success-message hidden">
+                    ✓ 메시지가 등록되었습니다!
+                </div>
+
+                <!-- 입력 영역 -->
+                <div class="message-input-wrapper">
+                    <input type="text" 
+                           class="message-input" 
+                           id="anonymousMessage" 
+                           placeholder="오늘 기분이 어떤지 한 줄로... (최대 50자)"
+                           maxlength="50"
+                           onkeypress="handleMessageKeyPress(event)">
+                    <button class="submit-message-btn" onclick="submitMessage()">
+                        등록
+                    </button>
+                </div>
+                <p class="input-hint">💡 엔터 키를 눌러도 등록됩니다</p>
                 
                 <h4 style="font-size: 14px; color: #666; margin-top: 20px;">최근 친구들의 한마디</h4>
                 <div class="message-list" id="messageList"></div>
@@ -377,7 +454,7 @@
     </div>
 
     <script>
-        // 데이터 저장소 (LocalStorage 사용)
+        // 데이터 저장소
         const STORAGE_KEYS = {
             MOOD_DATA: 'moodData',
             MESSAGES: 'anonymousMessages',
@@ -439,7 +516,7 @@
             }
         };
 
-        // 오늘의 질문들 (요일별로 다르게)
+        // 오늘의 질문들
         const dailyQuestions = [
             {
                 question: "요즘 가장 듣고 싶은 말은?",
@@ -470,6 +547,49 @@
                 options: ["친구랑 있을 때", "혼자 쉴 때", "좋아하는 것 할 때", "성취감 느낄 때", "맛있는 것 먹을 때"]
             }
         ];
+
+        // 🆕 엔터 키 처리
+        function handleMessageKeyPress(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                submitMessage();
+            }
+        }
+
+        // 🆕 메시지 등록 함수
+        function submitMessage() {
+            const input = document.getElementById('anonymousMessage');
+            const message = input.value.trim();
+
+            if (!message) {
+                alert('메시지를 입력해주세요!');
+                input.focus();
+                return;
+            }
+
+            // 메시지 저장
+            saveMessage(message, null);
+
+            // 입력창 비우기
+            input.value = '';
+
+            // 성공 메시지 표시
+            showSuccessMessage();
+
+            // 메시지 목록 새로고침
+            loadMessages();
+        }
+
+        // 🆕 성공 메시지 표시
+        function showSuccessMessage() {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.classList.remove('hidden');
+
+            // 3초 후 자동 숨김
+            setTimeout(() => {
+                successDiv.classList.add('hidden');
+            }, 3000);
+        }
 
         // 초기화
         function init() {
@@ -519,13 +639,11 @@
             const savedAnswer = localStorage.getItem(STORAGE_KEYS.DAILY_ANSWER);
             const answerData = savedAnswer ? JSON.parse(savedAnswer) : null;
 
-            // 오늘 이미 답변했는지 확인
             if (answerData && answerData.date === today) {
                 showQuestionResult(answerData.question, answerData.answer);
                 return;
             }
 
-            // 요일별로 질문 선택 (0=일요일, 6=토요일)
             const dayOfWeek = new Date().getDay();
             const question = dailyQuestions[dayOfWeek];
 
@@ -546,14 +664,12 @@
         function answerDailyQuestion(question, answer) {
             const today = new Date().toDateString();
             
-            // 답변 저장
             localStorage.setItem(STORAGE_KEYS.DAILY_ANSWER, JSON.stringify({
                 date: today,
                 question: question,
                 answer: answer
             }));
 
-            // 통계 업데이트
             const statsKey = `question_${today}`;
             let questionStats = JSON.parse(localStorage.getItem(statsKey)) || {};
             questionStats[answer] = (questionStats[answer] || 0) + 1;
@@ -593,16 +709,16 @@
 
         // 기분 선택
         function selectMood(mood) {
-            // 데이터 저장
             saveMoodData(mood);
             
-            // 익명 메시지 저장
-            const message = document.getElementById('anonymousMessage').value.trim();
+            // 익명 메시지가 입력되어 있으면 자동 저장
+            const messageInput = document.getElementById('anonymousMessage');
+            const message = messageInput.value.trim();
             if (message) {
                 saveMessage(message, mood);
+                messageInput.value = '';
             }
 
-            // 결과 화면 표시
             showResult(mood);
         }
 
@@ -620,10 +736,10 @@
             messages.unshift({
                 text: message,
                 mood: mood,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                isNew: true
             });
 
-            // 최대 50개만 저장
             if (messages.length > 50) {
                 messages.pop();
             }
@@ -665,8 +781,6 @@
 
             document.getElementById('statsContainer').innerHTML = statsHtml;
             document.getElementById('totalParticipants').textContent = total;
-            
-            // 결과 화면용
             document.getElementById('statsContainerResult').innerHTML = statsHtml;
             document.getElementById('totalParticipantsResult').textContent = total;
         }
@@ -675,12 +789,13 @@
         function loadMessages() {
             const messages = JSON.parse(localStorage.getItem(STORAGE_KEYS.MESSAGES)) || [];
             
-            const messageListHtml = messages.slice(0, 10).map(msg => {
+            const messageListHtml = messages.slice(0, 10).map((msg, index) => {
                 const time = new Date(msg.timestamp);
                 const timeStr = time.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+                const newClass = (index === 0 && msg.isNew) ? 'new' : '';
                 
                 return `
-                    <div class="message-item">
+                    <div class="message-item ${newClass}">
                         "${msg.text}"
                         <div class="message-time">${timeStr}</div>
                     </div>
@@ -688,7 +803,15 @@
             }).join('');
 
             document.getElementById('messageList').innerHTML = messageListHtml || 
-                '<p style="text-align: center; color: #999; font-size: 13px;">아직 메시지가 없어요</p>';
+                '<p style="text-align: center; color: #999; font-size: 13px;">아직 메시지가 없어요. 첫 번째 메시지를 남겨보세요!</p>';
+
+            // 새 메시지 플래그 제거
+            if (messages.length > 0 && messages[0].isNew) {
+                setTimeout(() => {
+                    messages[0].isNew = false;
+                    localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(messages));
+                }, 3000);
+            }
         }
 
         // 결과 화면 표시
@@ -709,7 +832,6 @@
             document.getElementById('mainScreen').classList.add('hidden');
             document.getElementById('resultScreen').classList.remove('hidden');
             
-            // 통계 다시 로드
             loadStats();
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -719,9 +841,7 @@
         function reset() {
             document.getElementById('mainScreen').classList.remove('hidden');
             document.getElementById('resultScreen').classList.add('hidden');
-            document.getElementById('anonymousMessage').value = '';
             
-            // 통계와 메시지 다시 로드
             loadStats();
             loadMessages();
             
