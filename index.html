@@ -47,6 +47,26 @@
             margin-bottom: 20px;
         }
         
+        .setup-notice {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .setup-notice h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .setup-notice p {
+            color: #856404;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        
         .streak-badge {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
@@ -56,6 +76,22 @@
             margin-bottom: 20px;
             font-size: 14px;
             font-weight: bold;
+        }
+        
+        .sync-badge {
+            display: inline-block;
+            background: #ff9800;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-left: 5px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
         }
         
         .daily-question {
@@ -120,6 +156,11 @@
             background: #667eea;
             color: white;
             transform: translateX(5px);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         
         .stats-section {
@@ -187,7 +228,6 @@
             margin-bottom: 15px;
         }
 
-        /* 개선: 메시지 입력 영역 */
         .message-input-wrapper {
             display: flex;
             gap: 8px;
@@ -227,11 +267,6 @@
             transform: translateX(0) scale(1.05);
         }
 
-        .submit-message-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* 등록 성공 메시지 */
         .success-message {
             background: #4CAF50;
             color: white;
@@ -366,17 +401,29 @@
             font-size: 14px;
             margin-bottom: 10px;
         }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            padding: 10px;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 출석 체크 배지 -->
-        <div class="streak-badge" id="streakBadge">
-            🔥 연속 방문: <span id="streakDays">1</span>일 | 총 방문: <span id="totalVisits">1</span>회
+        <div class="setup-notice">
+            <h3>⚙️ Google Sheets 연동 준비 중</h3>
+            <p>곧 모든 기기에서 실시간 동기화가 가능해집니다!<br>
+            잠시만 기다려주세요 😊</p>
         </div>
 
-        <!-- 오늘의 질문 -->
-        <div class="daily-question" id="dailyQuestion">
+        <div class="streak-badge">
+            🔥 연속 방문: <span id="streakDays">1</span>일 | 총 방문: <span id="totalVisits">1</span>회
+            <span class="sync-badge">⚙️ 설정 중</span>
+        </div>
+
+        <div class="daily-question">
             <h3>📅 오늘의 질문</h3>
             <p id="questionText" style="margin-bottom: 10px; font-size: 14px;"></p>
             <div class="options" id="questionOptions"></div>
@@ -390,10 +437,11 @@
                 맞춤 처방을 받아보세요
             </p>
             
-            <!-- 실시간 통계 -->
             <div class="stats-section">
                 <h3>📊 실시간 우리 반 마음 날씨</h3>
-                <div id="statsContainer"></div>
+                <div id="statsContainer">
+                    <div class="loading">통계 불러오는 중...</div>
+                </div>
                 <p class="total-count">총 <span id="totalParticipants">0</span>명 참여 중</p>
             </div>
 
@@ -408,16 +456,13 @@
                 </div>
             </div>
 
-            <!-- 개선된 익명 메시지 섹션 -->
             <div class="messages-section">
                 <h3>💬 익명의 한마디 (선택)</h3>
                 
-                <!-- 성공 메시지 -->
                 <div id="successMessage" class="success-message hidden">
                     ✓ 메시지가 등록되었습니다!
                 </div>
 
-                <!-- 입력 영역 -->
                 <div class="message-input-wrapper">
                     <input type="text" 
                            class="message-input" 
@@ -432,7 +477,9 @@
                 <p class="input-hint">💡 엔터 키를 눌러도 등록됩니다</p>
                 
                 <h4 style="font-size: 14px; color: #666; margin-top: 20px;">최근 친구들의 한마디</h4>
-                <div class="message-list" id="messageList"></div>
+                <div class="message-list" id="messageList">
+                    <div class="loading">메시지 불러오는 중...</div>
+                </div>
             </div>
         </div>
 
@@ -441,7 +488,6 @@
             
             <div class="prescription" id="prescription"></div>
 
-            <!-- 결과 화면에도 통계 표시 -->
             <div class="stats-section">
                 <h3>📊 실시간 통계 (업데이트됨!)</h3>
                 <div id="statsContainerResult"></div>
@@ -454,7 +500,7 @@
     </div>
 
     <script>
-        // 데이터 저장소
+        // 임시 버전 - Google Sheets 연동 준비 중
         const STORAGE_KEYS = {
             MOOD_DATA: 'moodData',
             MESSAGES: 'anonymousMessages',
@@ -462,93 +508,44 @@
             DAILY_ANSWER: 'dailyAnswer'
         };
 
-        // 처방전 데이터
         const prescriptions = {
             sunny: {
                 title: "💙 에너지 넘치는 당신",
                 message: "멋진 하루네요! 이 긍정적인 에너지를 친구들과 나눠보는 건 어떨까요?",
-                activities: [
-                    "친구에게 먼저 웃으며 인사하기",
-                    "좋아하는 노래 들으며 가볍게 스트레칭",
-                    "오늘 기분 좋았던 순간 3가지 메모하기",
-                    "감사한 일을 하나 떠올려보기"
-                ]
+                activities: ["친구에게 먼저 웃으며 인사하기", "좋아하는 노래 들으며 가볍게 스트레칭", "오늘 기분 좋았던 순간 3가지 메모하기", "감사한 일을 하나 떠올려보기"]
             },
             cloudy: {
                 title: "💙 조금 지친 당신",
                 message: "괜찮아요. 잠깐 쉬어가도 돼요. 무리하지 마세요.",
-                activities: [
-                    "창문 밖 하늘 보며 깊게 숨쉬기 3회",
-                    "따뜻한 차나 물 한 잔 천천히 마시기",
-                    "5분만 눈 감고 아무 생각 안 하기",
-                    "가벼운 목과 어깨 스트레칭"
-                ]
+                activities: ["창문 밖 하늘 보며 깊게 숨쉬기 3회", "따뜻한 차나 물 한 잔 천천히 마시기", "5분만 눈 감고 아무 생각 안 하기", "가벼운 목과 어깨 스트레칭"]
             },
             overcast: {
                 title: "💙 힘든 하루를 보내는 당신",
                 message: "지금 충분히 잘하고 있어요. 오늘 하루 버틴 것만으로도 대단해요.",
-                activities: [
-                    "좋아하는 노래 1~2곡 듣기",
-                    "신뢰하는 친구에게 '힘들다' 한마디 보내기",
-                    "잠깐이라도 혼자만의 시간 갖기",
-                    "따뜻한 물로 세수하기"
-                ]
+                activities: ["좋아하는 노래 1~2곡 듣기", "신뢰하는 친구에게 '힘들다' 한마디 보내기", "잠깐이라도 혼자만의 시간 갖기", "따뜻한 물로 세수하기"]
             },
             rainy: {
                 title: "💙 많이 힘든 당신",
                 message: "정말 힘들었겠어요. 혼자가 아니에요. 괜찮아질 거예요.",
-                activities: [
-                    "가장 편한 사람과 대화하기",
-                    "편안한 음악 들으며 간단히 일기 쓰기",
-                    "오늘은 일찍 쉬기",
-                    "내일 아침에 먹고 싶은 것 생각해보기"
-                ]
+                activities: ["가장 편한 사람과 대화하기", "편안한 음악 들으며 간단히 일기 쓰기", "오늘은 일찍 쉬기", "내일 아침에 먹고 싶은 것 생각해보기"]
             },
             stormy: {
                 title: "💙 지금 당장 도움이 필요한 당신",
                 message: "혼자 견디지 마세요. 주변에 도움을 요청해도 괜찮아요.",
-                activities: [
-                    "📞 가장 믿을 수 있는 사람에게 연락하기",
-                    "💬 학교 상담실 방문하기",
-                    "📱 청소년 상담전화 1388",
-                    "🏥 정신건강 위기상담 1577-0199"
-                ]
+                activities: ["📞 가장 믿을 수 있는 사람에게 연락하기", "💬 학교 상담실 방문하기", "📱 청소년 상담전화 1388", "🏥 정신건강 위기상담 1577-0199"]
             }
         };
 
-        // 오늘의 질문들
         const dailyQuestions = [
-            {
-                question: "요즘 가장 듣고 싶은 말은?",
-                options: ["고생했어", "잘하고 있어", "괜찮아", "힘내!", "네 편이야"]
-            },
-            {
-                question: "지금 가장 하고 싶은 것은?",
-                options: ["푹 자기", "맛있는 것 먹기", "친구랑 놀기", "혼자 있기", "운동하기"]
-            },
-            {
-                question: "스트레스 받을 때 나는?",
-                options: ["음악 듣기", "운동하기", "잠자기", "먹기", "게임하기"]
-            },
-            {
-                question: "지금 가장 필요한 것은?",
-                options: ["휴식", "격려", "공감", "조언", "혼자만의 시간"]
-            },
-            {
-                question: "힘들 때 가장 위로되는 것은?",
-                options: ["친구의 위로", "좋아하는 음악", "맛있는 음식", "숙면", "산책"]
-            },
-            {
-                question: "주말에 가장 하고 싶은 것은?",
-                options: ["늦잠 자기", "친구 만나기", "집에만 있기", "나들이", "취미생활"]
-            },
-            {
-                question: "내가 가장 행복한 순간은?",
-                options: ["친구랑 있을 때", "혼자 쉴 때", "좋아하는 것 할 때", "성취감 느낄 때", "맛있는 것 먹을 때"]
-            }
+            { question: "요즘 가장 듣고 싶은 말은?", options: ["고생했어", "잘하고 있어", "괜찮아", "힘내!", "네 편이야"] },
+            { question: "지금 가장 하고 싶은 것은?", options: ["푹 자기", "맛있는 것 먹기", "친구랑 놀기", "혼자 있기", "운동하기"] },
+            { question: "스트레스 받을 때 나는?", options: ["음악 듣기", "운동하기", "잠자기", "먹기", "게임하기"] },
+            { question: "지금 가장 필요한 것은?", options: ["휴식", "격려", "공감", "조언", "혼자만의 시간"] },
+            { question: "힘들 때 가장 위로되는 것은?", options: ["친구의 위로", "좋아하는 음악", "맛있는 음식", "숙면", "산책"] },
+            { question: "주말에 가장 하고 싶은 것은?", options: ["늦잠 자기", "친구 만나기", "집에만 있기", "나들이", "취미생활"] },
+            { question: "내가 가장 행복한 순간은?", options: ["친구랑 있을 때", "혼자 쉴 때", "좋아하는 것 할 때", "성취감 느낄 때", "맛있는 것 먹을 때"] }
         ];
 
-        // 🆕 엔터 키 처리
         function handleMessageKeyPress(event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
@@ -556,42 +553,26 @@
             }
         }
 
-        // 🆕 메시지 등록 함수
         function submitMessage() {
             const input = document.getElementById('anonymousMessage');
             const message = input.value.trim();
-
             if (!message) {
                 alert('메시지를 입력해주세요!');
                 input.focus();
                 return;
             }
-
-            // 메시지 저장
             saveMessage(message, null);
-
-            // 입력창 비우기
             input.value = '';
-
-            // 성공 메시지 표시
             showSuccessMessage();
-
-            // 메시지 목록 새로고침
             loadMessages();
         }
 
-        // 🆕 성공 메시지 표시
         function showSuccessMessage() {
             const successDiv = document.getElementById('successMessage');
             successDiv.classList.remove('hidden');
-
-            // 3초 후 자동 숨김
-            setTimeout(() => {
-                successDiv.classList.add('hidden');
-            }, 3000);
+            setTimeout(() => successDiv.classList.add('hidden'), 3000);
         }
 
-        // 초기화
         function init() {
             updateVisitData();
             loadStats();
@@ -599,21 +580,15 @@
             loadDailyQuestion();
         }
 
-        // 방문 데이터 업데이트
         function updateVisitData() {
             const today = new Date().toDateString();
             let visitData = JSON.parse(localStorage.getItem(STORAGE_KEYS.VISIT_DATA)) || {
-                lastVisit: null,
-                streak: 0,
-                totalVisits: 0,
-                visitDates: []
+                lastVisit: null, streak: 0, totalVisits: 0, visitDates: []
             };
-
             if (visitData.lastVisit !== today) {
                 const yesterday = new Date();
                 yesterday.setDate(yesterday.getDate() - 1);
                 const yesterdayStr = yesterday.toDateString();
-
                 if (visitData.lastVisit === yesterdayStr) {
                     visitData.streak++;
                 } else if (visitData.lastVisit !== null) {
@@ -621,37 +596,28 @@
                 } else {
                     visitData.streak = 1;
                 }
-
                 visitData.lastVisit = today;
                 visitData.totalVisits++;
                 visitData.visitDates.push(today);
-
                 localStorage.setItem(STORAGE_KEYS.VISIT_DATA, JSON.stringify(visitData));
             }
-
             document.getElementById('streakDays').textContent = visitData.streak;
             document.getElementById('totalVisits').textContent = visitData.totalVisits;
         }
 
-        // 오늘의 질문 로드
         function loadDailyQuestion() {
             const today = new Date().toDateString();
             const savedAnswer = localStorage.getItem(STORAGE_KEYS.DAILY_ANSWER);
             const answerData = savedAnswer ? JSON.parse(savedAnswer) : null;
-
             if (answerData && answerData.date === today) {
                 showQuestionResult(answerData.question, answerData.answer);
                 return;
             }
-
             const dayOfWeek = new Date().getDay();
             const question = dailyQuestions[dayOfWeek];
-
             document.getElementById('questionText').textContent = question.question;
-            
             const optionsContainer = document.getElementById('questionOptions');
             optionsContainer.innerHTML = '';
-            
             question.options.forEach(option => {
                 const btn = document.createElement('button');
                 btn.textContent = option;
@@ -660,152 +626,96 @@
             });
         }
 
-        // 오늘의 질문 답변
         function answerDailyQuestion(question, answer) {
             const today = new Date().toDateString();
-            
             localStorage.setItem(STORAGE_KEYS.DAILY_ANSWER, JSON.stringify({
-                date: today,
-                question: question,
-                answer: answer
+                date: today, question: question, answer: answer
             }));
-
             const statsKey = `question_${today}`;
             let questionStats = JSON.parse(localStorage.getItem(statsKey)) || {};
             questionStats[answer] = (questionStats[answer] || 0) + 1;
             localStorage.setItem(statsKey, JSON.stringify(questionStats));
-
             showQuestionResult(question, answer);
         }
 
-        // 질문 결과 표시
         function showQuestionResult(question, answer) {
             const today = new Date().toDateString();
             const statsKey = `question_${today}`;
             const questionStats = JSON.parse(localStorage.getItem(statsKey)) || {};
-
             document.getElementById('questionOptions').classList.add('hidden');
-            
             const resultDiv = document.getElementById('questionResult');
             resultDiv.classList.remove('hidden');
-            
             const total = Object.values(questionStats).reduce((a, b) => a + b, 0);
-            
-            let html = `<h4>당신의 선택: "${answer}"</h4>`;
-            html += '<div style="margin-top: 10px;">';
-            
+            let html = `<h4>당신의 선택: "${answer}"</h4><div style="margin-top: 10px;">`;
             Object.entries(questionStats).sort((a, b) => b[1] - a[1]).forEach(([opt, count]) => {
                 const percent = Math.round((count / total) * 100);
-                html += `
-                    <div style="margin: 5px 0; font-size: 12px;">
-                        <span>${opt}: ${percent}% (${count}명)</span>
-                    </div>
-                `;
+                html += `<div style="margin: 5px 0; font-size: 12px;"><span>${opt}: ${percent}% (${count}명)</span></div>`;
             });
-            
             html += '</div>';
             resultDiv.innerHTML = html;
         }
 
-        // 기분 선택
         function selectMood(mood) {
             saveMoodData(mood);
-            
-            // 익명 메시지가 입력되어 있으면 자동 저장
             const messageInput = document.getElementById('anonymousMessage');
             const message = messageInput.value.trim();
             if (message) {
                 saveMessage(message, mood);
                 messageInput.value = '';
             }
-
             showResult(mood);
         }
 
-        // 기분 데이터 저장
         function saveMoodData(mood) {
             let moodData = JSON.parse(localStorage.getItem(STORAGE_KEYS.MOOD_DATA)) || {};
             moodData[mood] = (moodData[mood] || 0) + 1;
             localStorage.setItem(STORAGE_KEYS.MOOD_DATA, JSON.stringify(moodData));
         }
 
-        // 메시지 저장
         function saveMessage(message, mood) {
             const messages = JSON.parse(localStorage.getItem(STORAGE_KEYS.MESSAGES)) || [];
-            
             messages.unshift({
-                text: message,
-                mood: mood,
-                timestamp: new Date().toISOString(),
-                isNew: true
+                text: message, mood: mood, timestamp: new Date().toISOString(), isNew: true
             });
-
-            if (messages.length > 50) {
-                messages.pop();
-            }
-
+            if (messages.length > 50) messages.pop();
             localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(messages));
         }
 
-        // 통계 로드
         function loadStats() {
             const moodData = JSON.parse(localStorage.getItem(STORAGE_KEYS.MOOD_DATA)) || {};
             const total = Object.values(moodData).reduce((a, b) => a + b, 0);
-
             const moodLabels = {
-                sunny: '🌞 맑음',
-                cloudy: '⛅ 구름 조금',
-                overcast: '☁️ 흐림',
-                rainy: '🌧️ 비',
-                stormy: '⛈️ 폭풍'
+                sunny: '🌞 맑음', cloudy: '⛅ 구름 조금', overcast: '☁️ 흐림',
+                rainy: '🌧️ 비', stormy: '⛈️ 폭풍'
             };
-
             const statsHtml = Object.entries(moodLabels).map(([key, label]) => {
                 const count = moodData[key] || 0;
                 const percent = total > 0 ? Math.round((count / total) * 100) : 0;
-                
                 return `
                     <div class="stat-bar">
-                        <div class="stat-label">
-                            <span>${label}</span>
-                            <span>${count}명</span>
-                        </div>
+                        <div class="stat-label"><span>${label}</span><span>${count}명</span></div>
                         <div class="bar-container">
-                            <div class="bar-fill" style="width: ${percent}%">
-                                ${percent}%
-                            </div>
+                            <div class="bar-fill" style="width: ${percent}%">${percent}%</div>
                         </div>
                     </div>
                 `;
             }).join('');
-
             document.getElementById('statsContainer').innerHTML = statsHtml;
             document.getElementById('totalParticipants').textContent = total;
             document.getElementById('statsContainerResult').innerHTML = statsHtml;
             document.getElementById('totalParticipantsResult').textContent = total;
         }
 
-        // 메시지 로드
         function loadMessages() {
             const messages = JSON.parse(localStorage.getItem(STORAGE_KEYS.MESSAGES)) || [];
-            
             const messageListHtml = messages.slice(0, 10).map((msg, index) => {
                 const time = new Date(msg.timestamp);
                 const timeStr = time.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
                 const newClass = (index === 0 && msg.isNew) ? 'new' : '';
-                
-                return `
-                    <div class="message-item ${newClass}">
-                        "${msg.text}"
-                        <div class="message-time">${timeStr}</div>
-                    </div>
-                `;
+                return `<div class="message-item ${newClass}">"${msg.text}"<div class="message-time">${timeStr}</div></div>`;
             }).join('');
-
             document.getElementById('messageList').innerHTML = messageListHtml || 
                 '<p style="text-align: center; color: #999; font-size: 13px;">아직 메시지가 없어요. 첫 번째 메시지를 남겨보세요!</p>';
-
-            // 새 메시지 플래그 제거
             if (messages.length > 0 && messages[0].isNew) {
                 setTimeout(() => {
                     messages[0].isNew = false;
@@ -814,41 +724,27 @@
             }
         }
 
-        // 결과 화면 표시
         function showResult(mood) {
             const prescription = prescriptions[mood];
-            
-            let html = `
-                <h3>${prescription.title}</h3>
-                <p>"${prescription.message}"</p>
-                
-                <h4>🎯 오늘 추천 활동</h4>
-                <ul>
+            let html = `<h3>${prescription.title}</h3><p>"${prescription.message}"</p>
+                <h4>🎯 오늘 추천 활동</h4><ul>
                     ${prescription.activities.map(activity => `<li>${activity}</li>`).join('')}
-                </ul>
-            `;
-            
+                </ul>`;
             document.getElementById('prescription').innerHTML = html;
             document.getElementById('mainScreen').classList.add('hidden');
             document.getElementById('resultScreen').classList.remove('hidden');
-            
             loadStats();
-            
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 리셋
         function reset() {
             document.getElementById('mainScreen').classList.remove('hidden');
             document.getElementById('resultScreen').classList.add('hidden');
-            
             loadStats();
             loadMessages();
-            
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 페이지 로드 시 초기화
         init();
     </script>
 </body>
