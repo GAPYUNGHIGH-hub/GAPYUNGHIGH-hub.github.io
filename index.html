@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>오늘의 마음 처방전</title>
     <script>
-        // ⚠️⚠️⚠️ 여기에 복사한 Google Script URL을 붙여넣으세요! ⚠️⚠️⚠️
-        // 아래 YOUR_GOOGLE_SCRIPT_URL을 삭제하고 실제 URL로 교체!
+        // ⚠️⚠️⚠️ 여기에 본인의 Google Script URL을 붙여넣으세요! ⚠️⚠️⚠️
         
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzhGE9YVXjXBEF1WmXd_-PEHMoS1QgCIbxXq3HcgjuKu7-EkDzhxTB89u6i7LmFzhXOQg/exec';
         
-        // 예시: const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby.../exec';
     </script>
     <style>
         * {
@@ -428,7 +426,7 @@
             <div class="question">
                 <h3>지금 이 순간, 당신의 마음은?</h3>
                 <div class="options">
-                    <button onclick="selectMood('sunny')">🌞 맑음 - 기분 좋고 에너지 넘침</button>
+                    <button onclick="selectMood('sunny')">🌞 맑음 - 기분 좋고 에너지가 충만</button>
                     <button onclick="selectMood('cloudy')">⛅ 구름 조금 - 괜찮은데 약간 피곤함</button>
                     <button onclick="selectMood('overcast')">☁️ 흐림 - 답답하고 무기력함</button>
                     <button onclick="selectMood('rainy')">🌧️ 비 - 힘들고 우울함</button>
@@ -474,20 +472,45 @@
                 <p class="total-count">총 <span id="totalParticipantsResult">0</span>명 참여 중</p>
             </div>
 
+            <!-- 결과 화면에도 익명 메시지 섹션 추가! -->
+            <div class="messages-section">
+                <h3>💬 익명의 한마디 남기기</h3>
+                
+                <div id="successMessageResult" class="success-message hidden">
+                    ✓ 메시지가 등록되었습니다!
+                </div>
+
+                <div class="message-input-wrapper">
+                    <input type="text" 
+                           class="message-input" 
+                           id="anonymousMessageResult" 
+                           placeholder="오늘 기분이 어떤지 한 줄로... (최대 50자)"
+                           maxlength="50"
+                           onkeypress="handleMessageKeyPressResult(event)">
+                    <button class="submit-message-btn" onclick="submitMessageFromResult()">
+                        등록
+                    </button>
+                </div>
+                <p class="input-hint">💡 엔터 키를 눌러도 등록됩니다</p>
+                
+                <h4 style="font-size: 14px; color: #666; margin-top: 20px;">최근 친구들의 한마디</h4>
+                <div class="message-list" id="messageListResult">
+                    <div class="loading">메시지 불러오는 중...</div>
+                </div>
+            </div>
+
             <button class="reset-btn" onclick="reset()">🔄 다시 체크하기</button>
             <p class="footer">💡 이 화면을 스크린샷으로 저장하면<br>힘들 때 다시 볼 수 있어요</p>
         </div>
     </div>
 
     <script>
-        // LocalStorage 키
         const STORAGE_KEYS = {
             VISIT_DATA: 'visitData',
             DAILY_ANSWER: 'dailyAnswer',
             BROWSER_ID: 'browserId'
         };
 
-        // 브라우저 고유 ID 생성
         function getBrowserId() {
             let browserId = localStorage.getItem(STORAGE_KEYS.BROWSER_ID);
             if (!browserId) {
@@ -497,7 +520,6 @@
             return browserId;
         }
 
-        // 처방전 데이터
         const prescriptions = {
             sunny: {
                 title: "💙 에너지 넘치는 당신",
@@ -551,7 +573,6 @@
             }
         };
 
-        // 오늘의 질문들
         const dailyQuestions = [
             { question: "요즘 가장 듣고 싶은 말은?", options: ["고생했어", "잘하고 있어", "괜찮아", "힘내!", "네 편이야"] },
             { question: "지금 가장 하고 싶은 것은?", options: ["푹 자기", "맛있는 것 먹기", "친구랑 놀기", "혼자 있기", "운동하기"] },
@@ -562,7 +583,6 @@
             { question: "내가 가장 행복한 순간은?", options: ["친구랑 있을 때", "혼자 쉴 때", "좋아하는 것 할 때", "성취감 느낄 때", "맛있는 것 먹을 때"] }
         ];
 
-        // Google Sheets에 데이터 전송
         async function sendToGoogleSheets(action, data) {
             try {
                 const response = await fetch(GOOGLE_SCRIPT_URL, {
@@ -580,7 +600,6 @@
             }
         }
 
-        // Google Sheets에서 통계 가져오기
         async function loadStatsFromServer() {
             try {
                 const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getStats');
@@ -599,7 +618,22 @@
             }
         }
 
-        // 통계 표시
+        // 질문 통계 가져오기
+        async function loadQuestionStatsFromServer() {
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getQuestionStats');
+                const data = await response.json();
+                
+                if (data.success && data.questionStats && Object.keys(data.questionStats).length > 0) {
+                    return data.questionStats;
+                }
+                return null;
+            } catch (error) {
+                console.error('질문 통계 로드 실패:', error);
+                return null;
+            }
+        }
+
         function displayStats(moodCounts, total) {
             const moodLabels = {
                 sunny: '🌞 맑음',
@@ -634,11 +668,11 @@
             document.getElementById('totalParticipantsResult').textContent = total;
         }
 
-        // 메시지 표시
         function displayMessages(messages) {
             if (!messages || messages.length === 0) {
-                document.getElementById('messageList').innerHTML = 
-                    '<p style="text-align: center; color: #999; font-size: 13px;">아직 메시지가 없어요. 첫 번째 메시지를 남겨보세요!</p>';
+                const emptyHtml = '<p style="text-align: center; color: #999; font-size: 13px;">아직 메시지가 없어요. 첫 번째 메시지를 남겨보세요!</p>';
+                document.getElementById('messageList').innerHTML = emptyHtml;
+                document.getElementById('messageListResult').innerHTML = emptyHtml;
                 return;
             }
 
@@ -655,9 +689,9 @@
             }).join('');
 
             document.getElementById('messageList').innerHTML = messageListHtml;
+            document.getElementById('messageListResult').innerHTML = messageListHtml;
         }
 
-        // 동기화 배지 업데이트
         function updateSyncBadge(success) {
             const badge = document.getElementById('syncBadge');
             if (success) {
@@ -669,7 +703,6 @@
             }
         }
 
-        // 엔터 키 처리
         function handleMessageKeyPress(event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
@@ -677,7 +710,13 @@
             }
         }
 
-        // 메시지 등록
+        function handleMessageKeyPressResult(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                submitMessageFromResult();
+            }
+        }
+
         async function submitMessage() {
             const input = document.getElementById('anonymousMessage');
             const message = input.value.trim();
@@ -699,19 +738,43 @@
             });
 
             input.value = '';
-            showSuccessMessage();
+            showSuccessMessage('successMessage');
             
             setTimeout(() => loadStatsFromServer(), 1000);
         }
 
-        // 성공 메시지 표시
-        function showSuccessMessage() {
-            const successDiv = document.getElementById('successMessage');
+        async function submitMessageFromResult() {
+            const input = document.getElementById('anonymousMessageResult');
+            const message = input.value.trim();
+
+            if (!message) {
+                alert('메시지를 입력해주세요!');
+                input.focus();
+                return;
+            }
+
+            const visitData = JSON.parse(localStorage.getItem(STORAGE_KEYS.VISIT_DATA)) || {};
+
+            await sendToGoogleSheets('saveMood', {
+                mood: null,
+                message: message,
+                streak: visitData.streak || 1,
+                totalVisits: visitData.totalVisits || 1,
+                browserId: getBrowserId()
+            });
+
+            input.value = '';
+            showSuccessMessage('successMessageResult');
+            
+            setTimeout(() => loadStatsFromServer(), 1000);
+        }
+
+        function showSuccessMessage(elementId) {
+            const successDiv = document.getElementById(elementId);
             successDiv.classList.remove('hidden');
             setTimeout(() => successDiv.classList.add('hidden'), 3000);
         }
 
-        // 방문 데이터 업데이트
         function updateVisitData() {
             const today = new Date().toDateString();
             let visitData = JSON.parse(localStorage.getItem(STORAGE_KEYS.VISIT_DATA)) || {
@@ -747,7 +810,6 @@
             return visitData;
         }
 
-        // 오늘의 질문 로드
         function loadDailyQuestion() {
             const today = new Date().toDateString();
             const savedAnswer = localStorage.getItem(STORAGE_KEYS.DAILY_ANSWER);
@@ -774,7 +836,6 @@
             });
         }
 
-        // 오늘의 질문 답변
         async function answerDailyQuestion(question, answer) {
             const today = new Date().toDateString();
             
@@ -790,46 +851,66 @@
                 browserId: getBrowserId()
             });
 
-            showQuestionResult(question, answer);
+            // 통계 가져오기
+            setTimeout(async () => {
+                await showQuestionResult(question, answer);
+            }, 1000);
         }
 
-        // 질문 결과 표시
-        function showQuestionResult(question, answer) {
+        async function showQuestionResult(question, answer) {
             document.getElementById('questionOptions').classList.add('hidden');
             
             const resultDiv = document.getElementById('questionResult');
             resultDiv.classList.remove('hidden');
             
+            // 서버에서 통계 가져오기
+            const questionStats = await loadQuestionStatsFromServer();
+            
             let html = `<h4>당신의 선택: "${answer}"</h4>`;
-            html += '<p style="font-size: 12px; color: #666; margin-top: 10px;">답변이 저장되었습니다!</p>';
+            
+            if (questionStats && Object.keys(questionStats).length > 0) {
+                const total = Object.values(questionStats).reduce((a, b) => a + b, 0);
+                html += '<div style="margin-top: 15px;">';
+                html += '<p style="font-size: 13px; color: #666; margin-bottom: 10px;">📊 실시간 투표 결과</p>';
+                
+                Object.entries(questionStats)
+                    .sort((a, b) => b[1] - a[1])
+                    .forEach(([opt, count]) => {
+                        const percent = Math.round((count / total) * 100);
+                        const isSelected = opt === answer;
+                        const bgColor = isSelected ? '#e8f5e9' : 'white';
+                        html += `
+                            <div style="background: ${bgColor}; padding: 8px; margin: 5px 0; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; border: 1px solid #e0e0e0;">
+                                <span style="font-weight: ${isSelected ? 'bold' : 'normal'};">${opt}${isSelected ? ' ✓' : ''}</span>
+                                <span style="color: #667eea; font-weight: bold;">${percent}% (${count}명)</span>
+                            </div>
+                        `;
+                    });
+                html += '</div>';
+            } else {
+                html += '<p style="font-size: 12px; color: #666; margin-top: 10px;">답변이 저장되었습니다!</p>';
+            }
             
             resultDiv.innerHTML = html;
         }
 
-        // 기분 선택
         async function selectMood(mood) {
-            const messageInput = document.getElementById('anonymousMessage');
-            const message = messageInput.value.trim();
+            // 메시지 입력 여부와 관계없이 기분만 저장
             const visitData = JSON.parse(localStorage.getItem(STORAGE_KEYS.VISIT_DATA)) || {};
 
             await sendToGoogleSheets('saveMood', {
                 mood: mood,
-                message: message,
+                message: '',  // 일단 빈 메시지로 저장
                 streak: visitData.streak || 1,
                 totalVisits: visitData.totalVisits || 1,
                 browserId: getBrowserId()
             });
-
-            if (message) {
-                messageInput.value = '';
-            }
 
             showResult(mood);
 
             setTimeout(() => loadStatsFromServer(), 1000);
         }
 
-        // 결과 화면 표시
         function showResult(mood) {
             const prescription = prescriptions[mood];
             
@@ -850,24 +931,25 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 리셋
         function reset() {
             document.getElementById('mainScreen').classList.remove('hidden');
             document.getElementById('resultScreen').classList.add('hidden');
+            
+            // 입력창 비우기
+            document.getElementById('anonymousMessage').value = '';
+            document.getElementById('anonymousMessageResult').value = '';
             
             loadStatsFromServer();
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 초기화
         async function init() {
             updateVisitData();
             loadDailyQuestion();
             await loadStatsFromServer();
         }
 
-        // 페이지 로드 시 초기화
         init();
     </script>
 </body>
