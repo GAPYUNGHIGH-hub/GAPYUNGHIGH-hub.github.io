@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 마음 처방전</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 25px;
+            padding: 40px 30px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .question {
+            margin: 25px 0;
+        }
+        
+        .question h3 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        button {
+            padding: 16px 20px;
+            font-size: 16px;
+            border: 2px solid #667eea;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            color: #333;
+        }
+        
+        button:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        .result {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .result h2 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .prescription {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .prescription h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+        
+        .prescription p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #444;
+            margin: 15px 0;
+        }
+        
+        .prescription h4 {
+            color: #764ba2;
+            margin: 20px 0 10px 0;
+            font-size: 17px;
+        }
+        
+        .prescription ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .prescription li {
+            padding: 10px 0;
+            padding-left: 25px;
+            position: relative;
+            line-height: 1.6;
+        }
+        
+        .prescription li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .reset-btn {
+            width: 100%;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        
+        .reset-btn:hover {
+            background: #764ba2;
+            transform: translateX(0);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="survey">
+            <h1>💊 오늘의 마음 처방전</h1>
+            <p class="subtitle">
+                3개 질문, 30초면 끝!<br>
+                당신만을 위한 맞춤 처방을 받아보세요
+            </p>
+            
+            <div class="question">
+                <h3>지금 이 순간, 당신의 마음 날씨는?</h3>
+                <div class="options">
+                    <button onclick="showResult('sunny')">🌞 맑음 - 기분 좋고 에너지 넘침</button>
+                    <button onclick="showResult('cloudy')">⛅ 구름 조금 - 괜찮은데 약간 피곤함</button>
+                    <button onclick="showResult('overcast')">☁️ 흐림 - 답답하고 무기력함</button>
+                    <button onclick="showResult('rainy')">🌧️ 비 - 힘들고 우울함</button>
+                    <button onclick="showResult('stormy')">⛈️ 폭풍 - 감당하기 어려움</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="result" class="result">
+            <h2>📋 당신의 마음 처방전</h2>
+            <div class="prescription" id="prescription"></div>
+            <button class="reset-btn" onclick="reset()">🔄 다시 받기</button>
+            <p class="footer">💡 이 화면을 스크린샷으로 저장하면<br>힘들 때 다시 볼 수 있어요</p>
+        </div>
+    </div>
+
+    <script>
+        const prescriptions = {
+            sunny: {
+                title: "💙 에너지 넘치는 당신",
+                message: "멋진 하루네요! 이 긍정적인 에너지를 친구들과 나눠보는 건 어떨까요?",
+                activities: [
+                    "친구에게 먼저 웃으며 인사하기",
+                    "좋아하는 노래 들으며 가볍게 스트레칭",
+                    "오늘 기분 좋았던 순간 3가지 메모하기",
+                    "감사한 일을 하나 떠올려보기"
+                ]
+            },
+            cloudy: {
+                title: "💙 조금 지친 당신",
+                message: "괜찮아요. 잠깐 쉬어가도 돼요. 무리하지 마세요.",
+                activities: [
+                    "창문 밖 하늘 보며 깊게 숨쉬기 3회",
+                    "따뜻한 차나 물 한 잔 천천히 마시기",
+                    "5분만 눈 감고 아무 생각 안 하기",
+                    "가벼운 목과 어깨 스트레칭"
+                ]
+            },
+            overcast: {
+                title: "💙 힘든 하루를 보내는 당신",
+                message: "지금 충분히 잘하고 있어요. 오늘 하루 버틴 것만으로도 대단해요.",
+                activities: [
+                    "좋아하는 노래 1~2곡 듣기",
+                    "신뢰하는 친구에게 '힘들다' 한마디 보내기",
+                    "잠깐이라도 혼자만의 시간 갖기",
+                    "따뜻한 물로 세수하기"
+                ]
+            },
+            rainy: {
+                title: "💙 많이 힘든 당신",
+                message: "정말 힘들었겠어요. 혼자가 아니에요. 괜찮아질 거예요.",
+                activities: [
+                    "가장 편한 사람과 대화하기 (가족, 친구, 선생님)",
+                    "편안한 음악 들으며 간단히 일기 쓰기",
+                    "오늘은 일찍 쉬기",
+                    "내일 아침에 먹고 싶은 것 생각해보기"
+                ]
+            },
+            stormy: {
+                title: "💙 지금 당장 도움이 필요한 당신",
+                message: "혼자 견디지 마세요. 주변에 도움을 요청해도 괜찮아요.",
+                activities: [
+                    "📞 가장 믿을 수 있는 사람에게 연락하기",
+                    "💬 학교 상담실 방문하기",
+                    "📱 청소년 상담전화 1388",
+                    "🏥 정신건강 위기상담 1577-0199"
+                ]
+            }
+        };
+
+        function showResult(mood) {
+            const prescription = prescriptions[mood];
+            
+            let html = `
+                <h3>${prescription.title}</h3>
+                <p>"${prescription.message}"</p>
+                
+                <h4>🎯 오늘 추천 활동</h4>
+                <ul>
+                    ${prescription.activities.map(activity => `<li>${activity}</li>`).join('')}
+                </ul>
+            `;
+            
+            document.getElementById('prescription').innerHTML = html;
+            document.getElementById('survey').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function reset() {
+            document.getElementById('survey').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
