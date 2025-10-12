@@ -956,32 +956,59 @@
             const today = new Date().toDateString();
             const savedAnswer = localStorage.getItem(STORAGE_KEYS.DAILY_ANSWER);
             const answerData = savedAnswer ? JSON.parse(savedAnswer) : null;
-
+        
             const dayOfWeek = new Date().getDay();
             const question = dailyQuestions[dayOfWeek];
             document.getElementById('questionText').textContent = question.question;
-
-            if (answerData && answerData.date === today) {
-                document.getElementById('questionOptions').classList.add('hidden');
+        
+            const optionsContainer = document.getElementById('questionOptions');
+            optionsContainer.innerHTML = '';
+            optionsContainer.classList.remove('hidden');
+            
+            // 항상 선택지 표시!
+            question.options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.textContent = option;
                 
+                // 이미 답변했으면 비활성화
+                if (answerData && answerData.date === today) {
+                    btn.disabled = true;
+                    if (answerData.answer === option) {
+                        btn.style.background = '#4CAF50';
+                        btn.style.color = 'white';
+                        btn.textContent = option + ' ✓';
+                    }
+                } else {
+                    btn.onclick = () => answerDailyQuestion(question.question, option);
+                }
+                
+                optionsContainer.appendChild(btn);
+            });
+        
+            // 이미 답변한 경우 통계도 표시
+            if (answerData && answerData.date === today) {
+                // 안내 메시지
+                const alreadyAnswered = document.createElement('div');
+                alreadyAnswered.style.cssText = `
+                    background: white;
+                    padding: 10px;
+                    border-radius: 8px;
+                    margin-top: 10px;
+                    text-align: center;
+                    font-size: 12px;
+                    color: #4CAF50;
+                    font-weight: bold;
+                `;
+                alreadyAnswered.textContent = '✓ 오늘 이미 참여했습니다!';
+                optionsContainer.appendChild(alreadyAnswered);
+                
+                // 통계 로드
                 setTimeout(async () => {
                     const questionStats = await loadQuestionStatsFromServer();
                     showQuestionPrescription(answerData.question, answerData.answer, questionStats);
                 }, 300);
-            } else {
-                const optionsContainer = document.getElementById('questionOptions');
-                optionsContainer.innerHTML = '';
-                optionsContainer.classList.remove('hidden');
-                
-                question.options.forEach(option => {
-                    const btn = document.createElement('button');
-                    btn.textContent = option;
-                    btn.onclick = () => answerDailyQuestion(question.question, option);
-                    optionsContainer.appendChild(btn);
-                });
             }
         }
-
         async function answerDailyQuestion(question, answer) {
             const today = new Date().toDateString();
             
