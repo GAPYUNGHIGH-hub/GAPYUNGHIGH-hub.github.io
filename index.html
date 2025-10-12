@@ -809,24 +809,38 @@
 
             return visitData;
         }
-
-        function loadDailyQuestion() {
+        
+        async function loadDailyQuestion() {
             const today = new Date().toDateString();
             const savedAnswer = localStorage.getItem(STORAGE_KEYS.DAILY_ANSWER);
             const answerData = savedAnswer ? JSON.parse(savedAnswer) : null;
-
+        
+            // 오늘 답변이 있는지 확인하고, 서버에서 통계도 확인
             if (answerData && answerData.date === today) {
-                showQuestionResult(answerData.question, answerData.answer);
-                return;
+                const questionStats = await loadQuestionStatsFromServer();
+                
+                // 서버에 통계가 있을 때만 결과 표시
+                if (questionStats && Object.keys(questionStats).length > 0) {
+                    showQuestionResult(answerData.question, answerData.answer);
+                    return;
+                } else {
+                    // 통계가 없으면 localStorage 초기화하고 질문 다시 보여주기
+                    localStorage.removeItem(STORAGE_KEYS.DAILY_ANSWER);
+                }
             }
-
+        
+            // 질문 선택지 표시
             const dayOfWeek = new Date().getDay();
             const question = dailyQuestions[dayOfWeek];
-
+        
             document.getElementById('questionText').textContent = question.question;
             
             const optionsContainer = document.getElementById('questionOptions');
             optionsContainer.innerHTML = '';
+            optionsContainer.classList.remove('hidden');
+            
+            // 결과 영역 숨기기
+            document.getElementById('questionResult').classList.add('hidden');
             
             question.options.forEach(option => {
                 const btn = document.createElement('button');
@@ -858,42 +872,47 @@
         }
 
         async function showQuestionResult(question, answer) {
-            document.getElementById('questionOptions').classList.add('hidden');
-            
+            const optionsContainer = document.getElementById('questionOptions');
             const resultDiv = document.getElementById('questionResult');
-            resultDiv.classList.remove('hidden');
             
             // 서버에서 통계 가져오기
             const questionStats = await loadQuestionStatsFromServer();
             
+            // 통계가 없으면 질문 선택지 다시 표시
+            if (!questionStats || Object.keys(questionStats).length === 0) {
+                optionsContainer.classList.remove('hidden');
+                resultDiv.classList.add('hidden');
+                localStorage.removeItem(STORAGE_KEYS.DAILY_ANSWER);
+                return;
+            }
+            
+            // 통계가 있으면 결과 표시
+            optionsContainer.classList.add('hidden');
+            resultDiv.classList.remove('hidden');
+            
             let html = `<h4>당신의 선택: "${answer}"</h4>`;
             
-            if (questionStats && Object.keys(questionStats).length > 0) {
-                const total = Object.values(questionStats).reduce((a, b) => a + b, 0);
-                html += '<div style="margin-top: 15px;">';
-                html += '<p style="font-size: 13px; color: #666; margin-bottom: 10px;">📊 실시간 투표 결과</p>';
-                
-                Object.entries(questionStats)
-                    .sort((a, b) => b[1] - a[1])
-                    .forEach(([opt, count]) => {
-                        const percent = Math.round((count / total) * 100);
-                        const isSelected = opt === answer;
-                        const bgColor = isSelected ? '#e8f5e9' : 'white';
-                        html += `
-                            <div style="background: ${bgColor}; padding: 8px; margin: 5px 0; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; border: 1px solid #e0e0e0;">
-                                <span style="font-weight: ${isSelected ? 'bold' : 'normal'};">${opt}${isSelected ? ' ✓' : ''}</span>
-                                <span style="color: #667eea; font-weight: bold;">${percent}% (${count}명)</span>
-                            </div>
-                        `;
-                    });
-                html += '</div>';
-            } else {
-                html += '<p style="font-size: 12px; color: #666; margin-top: 10px;">답변이 저장되었습니다!</p>';
-            }
+            const total = Object.values(questionStats).reduce((a, b) => a + b, 0);
+            html += '<div style="margin-top: 15px;">';
+            html += '<p style="font-size: 13px; color: #666; margin-bottom: 10px;">📊 실시간 투표 결과</p>';
+            
+            Object.entries(questionStats)
+                .sort((a, b) => b[1] - a[1])
+                .forEach(([opt, count]) => {
+                    const percent = Math.round((count / total) * 100);
+                    const isSelected = opt === answer;
+                    const bgColor = isSelected ? '#e8f5e9' : 'white';
+                    html += `
+                        <div style="background: ${bgColor}; padding: 8px; margin: 5px 0; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; border: 1px solid #e0e0e0;">
+                            <span style="font-weight: ${isSelected ? 'bold' : 'normal'};">${opt}${isSelected ? ' ✓' : ''}</span>
+                            <span style="color: #667eea; font-weight: bold;">${percent}% (${count}명)</span>
+                        </div>
+                    `;
+                });
+            html += '</div>';
             
             resultDiv.innerHTML = html;
         }
-
         async function selectMood(mood) {
             // 메시지 입력 여부와 관계없이 기분만 저장
             const visitData = JSON.parse(localStorage.getItem(STORAGE_KEYS.VISIT_DATA)) || {};
