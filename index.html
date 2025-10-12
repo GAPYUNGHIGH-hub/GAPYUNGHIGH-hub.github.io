@@ -38,6 +38,19 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        @keyframes slideDown {
+            from { 
+                opacity: 0; 
+                max-height: 0;
+                transform: translateY(-20px);
+            }
+            to { 
+                opacity: 1; 
+                max-height: 2000px;
+                transform: translateY(0);
+            }
+        }
         
         h1 {
             color: #667eea;
@@ -306,6 +319,8 @@
             padding: 20px;
             border-radius: 12px;
             margin: 20px 0;
+            animation: slideDown 0.5s ease;
+            overflow: hidden;
         }
         
         .prescription h3 {
@@ -347,13 +362,14 @@
             font-weight: bold;
         }
 
-        /* 질문 통계 처방전 스타일 */
         .question-prescription {
             background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
             padding: 20px;
             border-radius: 12px;
-            margin: 20px 0;
+            margin: 15px 0 0 0;
             border: 2px solid #ff9800;
+            animation: slideDown 0.5s ease;
+            overflow: hidden;
         }
 
         .question-prescription h3 {
@@ -446,7 +462,6 @@
             color: #999;
         }
 
-        /* 제작자 표시 */
         .creator-info {
             text-align: center;
             color: #999;
@@ -499,113 +514,66 @@
             <h3>📅 오늘의 질문</h3>
             <p id="questionText" style="margin-bottom: 10px; font-size: 14px;"></p>
             <div class="options" id="questionOptions"></div>
-            <div class="question-result hidden" id="questionResult"></div>
+            <div id="questionResultContainer" class="hidden"></div>
         </div>
 
-        <div id="mainScreen">
-            <h1>💊 오늘의 마음 처방전</h1>
-            <p class="subtitle">
-                지금 이 순간의 마음을 체크하고<br>
-                맞춤 처방을 받아보세요
-            </p>
-            
-            <div class="stats-section">
-                <h3>📊 실시간 우리 반 마음 날씨</h3>
-                <div id="statsContainer">
-                    <div class="loading">통계 불러오는 중...</div>
-                </div>
-                <p class="total-count">총 <span id="totalParticipants">0</span>명 참여 중</p>
+        <h1>💊 오늘의 마음 처방전</h1>
+        <p class="subtitle">
+            지금 이 순간의 마음을 체크하고<br>
+            맞춤 처방을 받아보세요
+        </p>
+        
+        <div class="stats-section">
+            <h3>📊 실시간 우리 반 마음 날씨</h3>
+            <div id="statsContainer">
+                <div class="loading">통계 불러오는 중...</div>
             </div>
+            <p class="total-count">총 <span id="totalParticipants">0</span>명 참여 중</p>
+        </div>
 
-            <div class="question">
-                <h3>지금 이 순간, 당신의 마음은?</h3>
-                <div class="options">
-                    <button onclick="selectMood('sunny')">🌞 맑음 - 기분 좋고 에너지가 충만</button>
-                    <button onclick="selectMood('cloudy')">⛅ 구름 조금 - 괜찮은데 약간 피곤함</button>
-                    <button onclick="selectMood('overcast')">☁️ 흐림 - 답답하고 무기력함</button>
-                    <button onclick="selectMood('rainy')">🌧️ 비 - 힘들고 우울함</button>
-                    <button onclick="selectMood('stormy')">⛈️ 폭풍 - 감당하기 어려움</button>
-                </div>
-            </div>
-
-            <div class="messages-section">
-                <h3>💬 익명의 한마디 (선택)</h3>
-                
-                <div id="successMessage" class="success-message hidden">
-                    ✓ 메시지가 등록되었습니다!
-                </div>
-
-                <div class="message-input-wrapper">
-                    <input type="text" 
-                           class="message-input" 
-                           id="anonymousMessage" 
-                           placeholder="오늘 기분이 어떤지 한 줄로... (최대 50자)"
-                           maxlength="50"
-                           onkeypress="handleMessageKeyPress(event)">
-                    <button class="submit-message-btn" onclick="submitMessage()">
-                        등록
-                    </button>
-                </div>
-                <p class="input-hint">💡 엔터 키를 눌러도 등록됩니다</p>
-                
-                <h4 style="font-size: 14px; color: #666; margin-top: 20px;">최근 친구들의 한마디</h4>
-                <div class="message-list" id="messageList">
-                    <div class="loading">메시지 불러오는 중...</div>
-                </div>
-            </div>
-
-            <!-- 제작자 정보 -->
-            <div class="creator-info">
-                <div class="title">✨ 우리 반 마음 프로젝트 · 2025</div>
-                <div class="details">기획·개발 남소영 | Made with 💜 for mental wellness</div>
+        <div class="question">
+            <h3>지금 이 순간, 당신의 마음은?</h3>
+            <div class="options">
+                <button onclick="selectMood('sunny')">🌞 맑음 - 기분 좋고 에너지가 충만</button>
+                <button onclick="selectMood('cloudy')">⛅ 구름 조금 - 괜찮은데 약간 피곤함</button>
+                <button onclick="selectMood('overcast')">☁️ 흐림 - 답답하고 무기력함</button>
+                <button onclick="selectMood('rainy')">🌧️ 비 - 힘들고 우울함</button>
+                <button onclick="selectMood('stormy')">⛈️ 폭풍 - 감당하기 어려움</button>
             </div>
         </div>
 
-        <div id="resultScreen" class="hidden">
-            <h2 style="color: #667eea; text-align: center; margin-bottom: 20px;">📋 당신의 마음 처방전</h2>
+        <!-- 처방전 영역 (버튼 아래에 표시됨) -->
+        <div id="prescriptionContainer" class="hidden"></div>
+
+        <div class="messages-section">
+            <h3>💬 익명의 한마디 (선택)</h3>
             
-            <div class="prescription" id="prescription"></div>
-
-            <div class="stats-section">
-                <h3>📊 실시간 통계 (업데이트됨!)</h3>
-                <div id="statsContainerResult"></div>
-                <p class="total-count">총 <span id="totalParticipantsResult">0</span>명 참여 중</p>
+            <div id="successMessage" class="success-message hidden">
+                ✓ 메시지가 등록되었습니다!
             </div>
 
-            <div class="messages-section">
-                <h3>💬 익명의 한마디 남기기</h3>
-                
-                <div id="successMessageResult" class="success-message hidden">
-                    ✓ 메시지가 등록되었습니다!
-                </div>
-
-                <div class="message-input-wrapper">
-                    <input type="text" 
-                           class="message-input" 
-                           id="anonymousMessageResult" 
-                           placeholder="오늘 기분이 어떤지 한 줄로... (최대 50자)"
-                           maxlength="50"
-                           onkeypress="handleMessageKeyPressResult(event)">
-                    <button class="submit-message-btn" onclick="submitMessageFromResult()">
-                        등록
-                    </button>
-                </div>
-                <p class="input-hint">💡 엔터 키를 눌러도 등록됩니다</p>
-                
-                <h4 style="font-size: 14px; color: #666; margin-top: 20px;">최근 친구들의 한마디</h4>
-                <div class="message-list" id="messageListResult">
-                    <div class="loading">메시지 불러오는 중...</div>
-                </div>
+            <div class="message-input-wrapper">
+                <input type="text" 
+                       class="message-input" 
+                       id="anonymousMessage" 
+                       placeholder="오늘 기분이 어떤지 한 줄로... (최대 50자)"
+                       maxlength="50"
+                       onkeypress="handleMessageKeyPress(event)">
+                <button class="submit-message-btn" onclick="submitMessage()">
+                    등록
+                </button>
             </div>
-
-            <button class="reset-btn" onclick="reset()">🔄 다시 체크하기</button>
-            <p class="footer">💡 이 화면을 스크린샷으로 저장하면<br>힘들 때 다시 볼 수 있어요</p>
-
-            <!-- 제작자 정보 -->
-            <div class="creator-info">
-                <div class="title">✨ 우리 반 마음 프로젝트 · 2025</div>
-                <div class="details">기획·개발 남소영 | Made with 💜 for mental wellness</div>
+            <p class="input-hint">💡 엔터 키를 눌러도 등록됩니다</p>
+            
+            <h4 style="font-size: 14px; color: #666; margin-top: 20px;">최근 친구들의 한마디</h4>
+            <div class="message-list" id="messageList">
+                <div class="loading">메시지 불러오는 중...</div>
             </div>
+        </div>
+
+        <div class="creator-info">
+            <div class="title">✨ 우리 반 마음 프로젝트 · 2025</div>
+            <div class="details">기획·개발 남소영 | Made with 💜 for mental wellness</div>
         </div>
     </div>
 
@@ -688,7 +656,6 @@
             { question: "내가 가장 행복한 순간은?", options: ["친구랑 있을 때", "혼자 쉴 때", "좋아하는 것 할 때", "성취감 느낄 때", "맛있는 것 먹을 때"] }
         ];
 
-        // 질문별 분석 데이터
         const questionAnalysis = {
             "요즘 가장 듣고 싶은 말은?": {
                 "고생했어": { message: "인정받고 싶은 마음이 크네요", advice: ["자신에게 '오늘도 고생했어' 말해주기", "작은 성취에도 스스로 칭찬하기"] },
@@ -821,15 +788,12 @@
 
             document.getElementById('statsContainer').innerHTML = statsHtml;
             document.getElementById('totalParticipants').textContent = total;
-            document.getElementById('statsContainerResult').innerHTML = statsHtml;
-            document.getElementById('totalParticipantsResult').textContent = total;
         }
 
         function displayMessages(messages) {
             if (!messages || messages.length === 0) {
-                const emptyHtml = '<p style="text-align: center; color: #999; font-size: 13px;">아직 메시지가 없어요. 첫 번째 메시지를 남겨보세요!</p>';
-                document.getElementById('messageList').innerHTML = emptyHtml;
-                document.getElementById('messageListResult').innerHTML = emptyHtml;
+                document.getElementById('messageList').innerHTML = 
+                    '<p style="text-align: center; color: #999; font-size: 13px;">아직 메시지가 없어요. 첫 번째 메시지를 남겨보세요!</p>';
                 return;
             }
 
@@ -846,7 +810,6 @@
             }).join('');
 
             document.getElementById('messageList').innerHTML = messageListHtml;
-            document.getElementById('messageListResult').innerHTML = messageListHtml;
         }
 
         function updateSyncBadge(success) {
@@ -864,13 +827,6 @@
             if (event.key === 'Enter') {
                 event.preventDefault();
                 submitMessage();
-            }
-        }
-
-        function handleMessageKeyPressResult(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                submitMessageFromResult();
             }
         }
 
@@ -896,32 +852,6 @@
 
             input.value = '';
             showSuccessMessage('successMessage');
-            
-            setTimeout(() => loadStatsFromServer(), 1000);
-        }
-
-        async function submitMessageFromResult() {
-            const input = document.getElementById('anonymousMessageResult');
-            const message = input.value.trim();
-
-            if (!message) {
-                alert('메시지를 입력해주세요!');
-                input.focus();
-                return;
-            }
-
-            const visitData = JSON.parse(localStorage.getItem(STORAGE_KEYS.VISIT_DATA)) || {};
-
-            await sendToGoogleSheets('saveMood', {
-                mood: null,
-                message: message,
-                streak: visitData.streak || 1,
-                totalVisits: visitData.totalVisits || 1,
-                browserId: getBrowserId()
-            });
-
-            input.value = '';
-            showSuccessMessage('successMessageResult');
             
             setTimeout(() => loadStatsFromServer(), 1000);
         }
@@ -973,14 +903,13 @@
             const answerData = savedAnswer ? JSON.parse(savedAnswer) : null;
 
             if (answerData && answerData.date === today) {
-                const questionStats = await loadQuestionStatsFromServer();
-                
-                if (questionStats && Object.keys(questionStats).length > 0) {
-                    showQuestionPrescription(answerData.question, answerData.answer, questionStats);
-                    return;
-                } else {
-                    localStorage.removeItem(STORAGE_KEYS.DAILY_ANSWER);
-                }
+                setTimeout(async () => {
+                    const questionStats = await loadQuestionStatsFromServer();
+                    if (questionStats && Object.keys(questionStats).length > 0) {
+                        showQuestionPrescription(answerData.question, answerData.answer, questionStats);
+                        return;
+                    }
+                }, 500);
             }
 
             const dayOfWeek = new Date().getDay();
@@ -991,8 +920,6 @@
             const optionsContainer = document.getElementById('questionOptions');
             optionsContainer.innerHTML = '';
             optionsContainer.classList.remove('hidden');
-            
-            document.getElementById('questionResult').classList.add('hidden');
             
             question.options.forEach(option => {
                 const btn = document.createElement('button');
@@ -1017,22 +944,26 @@
                 browserId: getBrowserId()
             });
 
+            // 버튼 숨기기
+            document.getElementById('questionOptions').classList.add('hidden');
+
+            // 1초 대기 후 통계 로드
             setTimeout(async () => {
                 const questionStats = await loadQuestionStatsFromServer();
                 showQuestionPrescription(question, answer, questionStats);
-            }, 1000);
+            }, 1500);
         }
 
         function showQuestionPrescription(question, answer, questionStats) {
-            document.getElementById('questionOptions').classList.add('hidden');
-            
-            const resultDiv = document.getElementById('questionResult');
-            resultDiv.classList.remove('hidden');
+            const container = document.getElementById('questionResultContainer');
+            container.classList.remove('hidden');
             
             if (!questionStats || Object.keys(questionStats).length === 0) {
-                resultDiv.innerHTML = `
-                    <h4>당신의 선택: "${answer}"</h4>
-                    <p style="font-size: 12px; color: #666; margin-top: 10px;">답변이 저장되었습니다!</p>
+                container.innerHTML = `
+                    <div style="background: white; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                        <h4 style="color: #667eea; font-size: 14px; margin-bottom: 10px;">당신의 선택: "${answer}"</h4>
+                        <p style="font-size: 12px; color: #666;">답변이 저장되었습니다!</p>
+                    </div>
                 `;
                 return;
             }
@@ -1083,7 +1014,12 @@
                 </div>
             `;
 
-            resultDiv.innerHTML = html;
+            container.innerHTML = html;
+            
+            // 부드럽게 스크롤
+            setTimeout(() => {
+                container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         }
 
         async function selectMood(mood) {
@@ -1097,40 +1033,43 @@
                 browserId: getBrowserId()
             });
 
-            showResult(mood);
+            showPrescription(mood);
 
             setTimeout(() => loadStatsFromServer(), 1000);
         }
 
-        function showResult(mood) {
+        function showPrescription(mood) {
             const prescription = prescriptions[mood];
+            const container = document.getElementById('prescriptionContainer');
             
             let html = `
-                <h3>${prescription.title}</h3>
-                <p>"${prescription.message}"</p>
-                
-                <h4>🎯 오늘 추천 활동</h4>
-                <ul>
-                    ${prescription.activities.map(activity => `<li>${activity}</li>`).join('')}
-                </ul>
+                <div class="prescription">
+                    <h3>${prescription.title}</h3>
+                    <p>"${prescription.message}"</p>
+                    
+                    <h4>🎯 오늘 추천 활동</h4>
+                    <ul>
+                        ${prescription.activities.map(activity => `<li>${activity}</li>`).join('')}
+                    </ul>
+
+                    <button class="reset-btn" onclick="resetPrescription()">🔄 다시 체크하기</button>
+                </div>
             `;
             
-            document.getElementById('prescription').innerHTML = html;
-            document.getElementById('mainScreen').classList.add('hidden');
-            document.getElementById('resultScreen').classList.remove('hidden');
+            container.innerHTML = html;
+            container.classList.remove('hidden');
             
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // 부드럽게 스크롤
+            setTimeout(() => {
+                container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         }
 
-        function reset() {
-            document.getElementById('mainScreen').classList.remove('hidden');
-            document.getElementById('resultScreen').classList.add('hidden');
+        function resetPrescription() {
+            document.getElementById('prescriptionContainer').classList.add('hidden');
+            document.getElementById('prescriptionContainer').innerHTML = '';
             
-            document.getElementById('anonymousMessage').value = '';
-            document.getElementById('anonymousMessageResult').value = '';
-            
-            loadStatsFromServer();
-            
+            // 페이지 맨 위로 부드럽게 스크롤
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
