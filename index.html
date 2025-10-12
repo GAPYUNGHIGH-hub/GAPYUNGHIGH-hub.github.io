@@ -7,7 +7,7 @@
     <script>
         // ⚠️⚠️⚠️ 여기에 본인의 Google Script URL을 붙여넣으세요! ⚠️⚠️⚠️
         
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzhGE9YVXjXBEF1WmXd_-PEHMoS1QgCIbxXq3HcgjuKu7-EkDzhxTB89u6i7LmFzhXOQg/exec';
+        const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL';
         
     </script>
     <style>
@@ -346,6 +346,79 @@
             color: #667eea;
             font-weight: bold;
         }
+
+        /* 질문 통계 처방전 스타일 */
+        .question-prescription {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 2px solid #ff9800;
+        }
+
+        .question-prescription h3 {
+            color: #f57c00;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .winner-badge {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb300 100%);
+            color: #663c00;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: bold;
+            font-size: 16px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
+        }
+
+        .analysis-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #ff9800;
+        }
+
+        .analysis-box p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 8px 0;
+        }
+
+        .question-prescription h4 {
+            color: #f57c00;
+            margin: 15px 0 10px 0;
+            font-size: 15px;
+        }
+
+        .question-prescription ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .question-prescription li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            line-height: 1.5;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .question-prescription li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #ff9800;
+            font-weight: bold;
+        }
         
         .reset-btn {
             width: 100%;
@@ -371,6 +444,27 @@
             margin-top: 15px;
             font-size: 12px;
             color: #999;
+        }
+
+        /* 제작자 표시 */
+        .creator-info {
+            text-align: center;
+            color: #999;
+            font-size: 11px;
+            margin-top: 30px;
+            padding: 20px 0;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .creator-info .title {
+            font-size: 12px;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .creator-info .details {
+            font-size: 10px;
+            color: #bbb;
         }
 
         .question-result {
@@ -459,6 +553,12 @@
                     <div class="loading">메시지 불러오는 중...</div>
                 </div>
             </div>
+
+            <!-- 제작자 정보 -->
+            <div class="creator-info">
+                <div class="title">✨ 우리 반 마음 프로젝트 · 2025</div>
+                <div class="details">기획·개발 남소영 | Made with 💜 for mental wellness</div>
+            </div>
         </div>
 
         <div id="resultScreen" class="hidden">
@@ -472,7 +572,6 @@
                 <p class="total-count">총 <span id="totalParticipantsResult">0</span>명 참여 중</p>
             </div>
 
-            <!-- 결과 화면에도 익명 메시지 섹션 추가! -->
             <div class="messages-section">
                 <h3>💬 익명의 한마디 남기기</h3>
                 
@@ -501,6 +600,12 @@
 
             <button class="reset-btn" onclick="reset()">🔄 다시 체크하기</button>
             <p class="footer">💡 이 화면을 스크린샷으로 저장하면<br>힘들 때 다시 볼 수 있어요</p>
+
+            <!-- 제작자 정보 -->
+            <div class="creator-info">
+                <div class="title">✨ 우리 반 마음 프로젝트 · 2025</div>
+                <div class="details">기획·개발 남소영 | Made with 💜 for mental wellness</div>
+            </div>
         </div>
     </div>
 
@@ -583,6 +688,59 @@
             { question: "내가 가장 행복한 순간은?", options: ["친구랑 있을 때", "혼자 쉴 때", "좋아하는 것 할 때", "성취감 느낄 때", "맛있는 것 먹을 때"] }
         ];
 
+        // 질문별 분석 데이터
+        const questionAnalysis = {
+            "요즘 가장 듣고 싶은 말은?": {
+                "고생했어": { message: "인정받고 싶은 마음이 크네요", advice: ["자신에게 '오늘도 고생했어' 말해주기", "작은 성취에도 스스로 칭찬하기"] },
+                "잘하고 있어": { message: "지금 조금 불안한가봐요", advice: ["지금까지 잘 해왔다는 것 인정하기", "완벽하지 않아도 괜찮아요"] },
+                "괜찮아": { message: "위로가 필요한 순간이네요", advice: ["힘든 감정을 억누르지 말고 표현하기", "믿을 수 있는 사람과 대화하기"] },
+                "힘내!": { message: "지쳐있지만 포기하고 싶지 않은 마음", advice: ["잠깐 쉬어가도 괜찮아요", "무리하지 말고 천천히"] },
+                "네 편이야": { message: "외롭고 혼자라는 느낌이 드나봐요", advice: ["주변 사람들과 가벼운 대화 시도하기", "당신은 혼자가 아니에요"] }
+            },
+            "지금 가장 하고 싶은 것은?": {
+                "푹 자기": { message: "많이 피곤한가봐요", advice: ["충분한 수면 취하기", "오늘은 일찍 자기", "낮잠 15분"] },
+                "맛있는 것 먹기": { message: "작은 행복이 필요한 순간", advice: ["좋아하는 간식 먹기", "맛있는 음식으로 기분 전환"] },
+                "친구랑 놀기": { message: "사람들과의 연결이 필요해요", advice: ["친구에게 먼저 연락하기", "함께할 시간 만들기"] },
+                "혼자 있기": { message: "혼자만의 시간이 필요해요", advice: ["조용한 공간에서 쉬기", "나만의 시간 갖기"] },
+                "운동하기": { message: "에너지를 발산하고 싶은 마음", advice: ["가벼운 산책이나 스트레칭", "몸을 움직이면 기분이 좋아져요"] }
+            },
+            "스트레스 받을 때 나는?": {
+                "음악 듣기": { message: "감정을 음악으로 풀어내는 타입", advice: ["플레이리스트 만들기", "좋아하는 노래 듣기"] },
+                "운동하기": { message: "활동적으로 스트레스를 푸는 타입", advice: ["규칙적인 운동 습관 만들기", "산책이나 조깅"] },
+                "잠자기": { message: "휴식이 최우선인 타입", advice: ["충분한 수면 시간 확보", "낮잠도 좋아요"] },
+                "먹기": { message: "음식으로 위안받는 타입", advice: ["건강한 간식 선택하기", "천천히 음미하며 먹기"] },
+                "게임하기": { message: "다른 세계에서 현실 잊기", advice: ["시간 정해서 즐기기", "과몰입 주의"] }
+            },
+            "지금 가장 필요한 것은?": {
+                "휴식": { message: "지금 당장 쉬어야 해요", advice: ["모든 걸 멈추고 쉬기", "죄책감 느끼지 말기"] },
+                "격려": { message: "응원이 절실한 순간", advice: ["자신을 응원하기", "작은 성취 인정하기"] },
+                "공감": { message: "이해받고 싶은 마음", advice: ["감정 솔직하게 표현하기", "공감해줄 사람 찾기"] },
+                "조언": { message: "방향을 찾고 싶어해요", advice: ["신뢰하는 사람과 상담하기", "다양한 관점 들어보기"] },
+                "혼자만의 시간": { message: "나를 돌아볼 시간 필요", advice: ["조용한 공간 찾기", "일기 쓰기"] }
+            },
+            "힘들 때 가장 위로되는 것은?": {
+                "친구의 위로": { message: "사람과의 연결이 힘이 되는 타입", advice: ["친구와 시간 보내기", "대화 나누기"] },
+                "좋아하는 음악": { message: "음악이 치유제인 타입", advice: ["플레이리스트 만들기", "집중해서 듣기"] },
+                "맛있는 음식": { message: "음식이 위안이 되는 타입", advice: ["좋아하는 음식 먹기", "천천히 음미하기"] },
+                "숙면": { message: "잠이 최고의 치유제", advice: ["일찍 자기", "편안한 환경 만들기"] },
+                "산책": { message: "자연이 위로가 되는 타입", advice: ["규칙적으로 걷기", "야외 시간 늘리기"] }
+            },
+            "주말에 가장 하고 싶은 것은?": {
+                "늦잠 자기": { message: "평일에 많이 피곤했나봐요", advice: ["주말엔 충분히 쉬기", "수면 빚 갚기"] },
+                "친구 만나기": { message: "사회적 관계가 중요한 타입", advice: ["주말 약속 잡기", "함께 할 활동 계획하기"] },
+                "집에만 있기": { message: "집이 가장 편안한 공간", advice: ["집에서 즐길 거리 찾기", "혼자만의 시간"] },
+                "나들이": { message: "활동적인 주말 선호", advice: ["가까운 곳 여행하기", "새로운 장소 탐험"] },
+                "취미생활": { message: "자기계발이 중요한 타입", advice: ["취미에 시간 투자하기", "새로운 것 배우기"] }
+            },
+            "내가 가장 행복한 순간은?": {
+                "친구랑 있을 때": { message: "관계 지향적인 성향", advice: ["친구와 시간 많이 갖기", "소중한 사람들과 연결"] },
+                "혼자 쉴 때": { message: "내향적이고 독립적인 성향", advice: ["혼자만의 시간 확보하기", "자기 돌봄"] },
+                "좋아하는 것 할 때": { message: "열정이 행복의 원천", advice: ["좋아하는 활동 시간 늘리기", "취미 발전시키기"] },
+                "성취감 느낄 때": { message: "목표 지향적인 성향", advice: ["작은 목표 세우고 달성하기", "성취 기록하기"] },
+                "맛있는 것 먹을 때": { message: "감각적 즐거움 추구", advice: ["맛있는 음식 탐험하기", "식사 시간 소중히"] }
+            }
+        };
+
         async function sendToGoogleSheets(action, data) {
             try {
                 const response = await fetch(GOOGLE_SCRIPT_URL, {
@@ -618,7 +776,6 @@
             }
         }
 
-        // 질문 통계 가져오기
         async function loadQuestionStatsFromServer() {
             try {
                 const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getQuestionStats');
@@ -809,37 +966,32 @@
 
             return visitData;
         }
-        
+
         async function loadDailyQuestion() {
             const today = new Date().toDateString();
             const savedAnswer = localStorage.getItem(STORAGE_KEYS.DAILY_ANSWER);
             const answerData = savedAnswer ? JSON.parse(savedAnswer) : null;
-        
-            // 오늘 답변이 있는지 확인하고, 서버에서 통계도 확인
+
             if (answerData && answerData.date === today) {
                 const questionStats = await loadQuestionStatsFromServer();
                 
-                // 서버에 통계가 있을 때만 결과 표시
                 if (questionStats && Object.keys(questionStats).length > 0) {
-                    showQuestionResult(answerData.question, answerData.answer);
+                    showQuestionPrescription(answerData.question, answerData.answer, questionStats);
                     return;
                 } else {
-                    // 통계가 없으면 localStorage 초기화하고 질문 다시 보여주기
                     localStorage.removeItem(STORAGE_KEYS.DAILY_ANSWER);
                 }
             }
-        
-            // 질문 선택지 표시
+
             const dayOfWeek = new Date().getDay();
             const question = dailyQuestions[dayOfWeek];
-        
+
             document.getElementById('questionText').textContent = question.question;
             
             const optionsContainer = document.getElementById('questionOptions');
             optionsContainer.innerHTML = '';
             optionsContainer.classList.remove('hidden');
             
-            // 결과 영역 숨기기
             document.getElementById('questionResult').classList.add('hidden');
             
             question.options.forEach(option => {
@@ -865,61 +1017,81 @@
                 browserId: getBrowserId()
             });
 
-            // 통계 가져오기
             setTimeout(async () => {
-                await showQuestionResult(question, answer);
+                const questionStats = await loadQuestionStatsFromServer();
+                showQuestionPrescription(question, answer, questionStats);
             }, 1000);
         }
 
-        async function showQuestionResult(question, answer) {
-            const optionsContainer = document.getElementById('questionOptions');
+        function showQuestionPrescription(question, answer, questionStats) {
+            document.getElementById('questionOptions').classList.add('hidden');
+            
             const resultDiv = document.getElementById('questionResult');
-            
-            // 서버에서 통계 가져오기
-            const questionStats = await loadQuestionStatsFromServer();
-            
-            // 통계가 없으면 질문 선택지 다시 표시
-            if (!questionStats || Object.keys(questionStats).length === 0) {
-                optionsContainer.classList.remove('hidden');
-                resultDiv.classList.add('hidden');
-                localStorage.removeItem(STORAGE_KEYS.DAILY_ANSWER);
-                return;
-            }
-            
-            // 통계가 있으면 결과 표시
-            optionsContainer.classList.add('hidden');
             resultDiv.classList.remove('hidden');
             
-            let html = `<h4>당신의 선택: "${answer}"</h4>`;
-            
+            if (!questionStats || Object.keys(questionStats).length === 0) {
+                resultDiv.innerHTML = `
+                    <h4>당신의 선택: "${answer}"</h4>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px;">답변이 저장되었습니다!</p>
+                `;
+                return;
+            }
+
             const total = Object.values(questionStats).reduce((a, b) => a + b, 0);
-            html += '<div style="margin-top: 15px;">';
-            html += '<p style="font-size: 13px; color: #666; margin-bottom: 10px;">📊 실시간 투표 결과</p>';
-            
-            Object.entries(questionStats)
-                .sort((a, b) => b[1] - a[1])
-                .forEach(([opt, count]) => {
-                    const percent = Math.round((count / total) * 100);
-                    const isSelected = opt === answer;
-                    const bgColor = isSelected ? '#e8f5e9' : 'white';
-                    html += `
-                        <div style="background: ${bgColor}; padding: 8px; margin: 5px 0; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; border: 1px solid #e0e0e0;">
-                            <span style="font-weight: ${isSelected ? 'bold' : 'normal'};">${opt}${isSelected ? ' ✓' : ''}</span>
-                            <span style="color: #667eea; font-weight: bold;">${percent}% (${count}명)</span>
-                        </div>
-                    `;
-                });
-            html += '</div>';
-            
+            const sortedStats = Object.entries(questionStats).sort((a, b) => b[1] - a[1]);
+            const topAnswer = sortedStats[0];
+            const topPercent = Math.round((topAnswer[1] / total) * 100);
+
+            const analysis = questionAnalysis[question]?.[topAnswer[0]] || {
+                message: "많은 친구들이 이 답변을 선택했어요",
+                advice: ["자신의 감정을 소중히 여기기", "필요한 것을 찾아가기"]
+            };
+
+            let html = `
+                <div class="question-prescription">
+                    <h3>📊 우리 반 마음 분석</h3>
+                    
+                    <div class="winner-badge">
+                        🏆 1위: ${topAnswer[0]} (${topPercent}%)
+                    </div>
+
+                    <div class="analysis-box">
+                        <p><strong>💭 우리 반의 마음:</strong></p>
+                        <p>${analysis.message}</p>
+                    </div>
+
+                    <h4>📈 전체 투표 결과</h4>
+            `;
+
+            sortedStats.forEach(([opt, count], index) => {
+                const percent = Math.round((count / total) * 100);
+                const isYourChoice = opt === answer;
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '  ';
+                html += `
+                    <div style="background: ${isYourChoice ? '#e8f5e9' : 'white'}; padding: 8px; margin: 5px 0; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; border: 1px solid #e0e0e0;">
+                        <span style="font-weight: ${isYourChoice ? 'bold' : 'normal'};">${medal} ${opt}${isYourChoice ? ' ✓' : ''}</span>
+                        <span style="color: #f57c00; font-weight: bold;">${percent}% (${count}명)</span>
+                    </div>
+                `;
+            });
+
+            html += `
+                    <h4>🎯 추천 활동</h4>
+                    <ul>
+                        ${analysis.advice.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+
             resultDiv.innerHTML = html;
         }
+
         async function selectMood(mood) {
-            // 메시지 입력 여부와 관계없이 기분만 저장
             const visitData = JSON.parse(localStorage.getItem(STORAGE_KEYS.VISIT_DATA)) || {};
 
             await sendToGoogleSheets('saveMood', {
                 mood: mood,
-                message: '',  // 일단 빈 메시지로 저장
+                message: '',
                 streak: visitData.streak || 1,
                 totalVisits: visitData.totalVisits || 1,
                 browserId: getBrowserId()
@@ -954,7 +1126,6 @@
             document.getElementById('mainScreen').classList.remove('hidden');
             document.getElementById('resultScreen').classList.add('hidden');
             
-            // 입력창 비우기
             document.getElementById('anonymousMessage').value = '';
             document.getElementById('anonymousMessageResult').value = '';
             
