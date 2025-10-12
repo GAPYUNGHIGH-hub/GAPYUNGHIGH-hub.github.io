@@ -519,6 +519,59 @@
             color: #bbb;
         }
 
+        /* 차트 및 리포트 섹션 스타일 */
+        .chart-section, .report-section {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+        
+        .chart-section h3, .report-section h3 {
+            color: #667eea;
+            font-size: 15px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .mood-chart-bar {
+            margin: 10px 0;
+        }
+        
+        .mood-chart-label {
+            font-size: 13px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .report-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+        
+        .report-card h4 {
+            font-size: 14px;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        
+        .report-stat {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 8px 0;
+        }
+        
+        .report-desc {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+
         @media (min-width: 480px) {
             body {
                 padding: 20px;
@@ -598,6 +651,37 @@
                 <div class="loading">통계 불러오는 중...</div>
             </div>
             <p class="total-count">총 <span id="totalParticipants">0</span>명 참여 중</p>
+        </div>
+
+        <!-- 📈 나의 마음 그래프 섹션 -->
+        <div class="chart-section" id="chartSection" style="display: none;">
+            <h3>📈 나의 마음 변화</h3>
+            <p style="text-align: center; font-size: 12px; color: #999; margin-bottom: 15px;">
+                최근 7일간의 기분 변화를 확인하세요
+            </p>
+            <div id="personalChart" style="margin: 20px 0;">
+                <p style="text-align: center; color: #999; font-size: 13px;">
+                    데이터를 불러오는 중...
+                </p>
+            </div>
+            <div id="classTrendChart" style="margin: 20px 0;">
+                <h4 style="font-size: 14px; margin: 15px 0; color: #667eea; text-align: center;">
+                    📊 우리 반 마음 트렌드
+                </h4>
+            </div>
+        </div>
+
+        <!-- 📊 주간 리포트 섹션 -->
+        <div class="report-section" id="reportSection" style="display: none;">
+            <h3>📊 나의 주간 리포트</h3>
+            <div id="reportContent" style="margin: 15px 0;">
+                <p style="text-align: center; color: #999; font-size: 13px;">
+                    데이터를 불러오는 중...
+                </p>
+            </div>
+            <button class="reset-btn" onclick="downloadReport()">
+                📥 리포트 다운로드 (PDF)
+            </button>
         </div>
 
         <div class="messages-section">
@@ -956,59 +1040,32 @@
             const today = new Date().toDateString();
             const savedAnswer = localStorage.getItem(STORAGE_KEYS.DAILY_ANSWER);
             const answerData = savedAnswer ? JSON.parse(savedAnswer) : null;
-        
+
             const dayOfWeek = new Date().getDay();
             const question = dailyQuestions[dayOfWeek];
             document.getElementById('questionText').textContent = question.question;
-        
-            const optionsContainer = document.getElementById('questionOptions');
-            optionsContainer.innerHTML = '';
-            optionsContainer.classList.remove('hidden');
-            
-            // 항상 선택지 표시!
-            question.options.forEach(option => {
-                const btn = document.createElement('button');
-                btn.textContent = option;
-                
-                // 이미 답변했으면 비활성화
-                if (answerData && answerData.date === today) {
-                    btn.disabled = true;
-                    if (answerData.answer === option) {
-                        btn.style.background = '#4CAF50';
-                        btn.style.color = 'white';
-                        btn.textContent = option + ' ✓';
-                    }
-                } else {
-                    btn.onclick = () => answerDailyQuestion(question.question, option);
-                }
-                
-                optionsContainer.appendChild(btn);
-            });
-        
-            // 이미 답변한 경우 통계도 표시
+
             if (answerData && answerData.date === today) {
-                // 안내 메시지
-                const alreadyAnswered = document.createElement('div');
-                alreadyAnswered.style.cssText = `
-                    background: white;
-                    padding: 10px;
-                    border-radius: 8px;
-                    margin-top: 10px;
-                    text-align: center;
-                    font-size: 12px;
-                    color: #4CAF50;
-                    font-weight: bold;
-                `;
-                alreadyAnswered.textContent = '✓ 오늘 이미 참여했습니다!';
-                optionsContainer.appendChild(alreadyAnswered);
+                document.getElementById('questionOptions').classList.add('hidden');
                 
-                // 통계 로드
                 setTimeout(async () => {
                     const questionStats = await loadQuestionStatsFromServer();
                     showQuestionPrescription(answerData.question, answerData.answer, questionStats);
                 }, 300);
+            } else {
+                const optionsContainer = document.getElementById('questionOptions');
+                optionsContainer.innerHTML = '';
+                optionsContainer.classList.remove('hidden');
+                
+                question.options.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.textContent = option;
+                    btn.onclick = () => answerDailyQuestion(question.question, option);
+                    optionsContainer.appendChild(btn);
+                });
             }
         }
+
         async function answerDailyQuestion(question, answer) {
             const today = new Date().toDateString();
             
@@ -1168,10 +1225,184 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // ===== 새로운 기능: 차트 및 리포트 =====
+        
+        async function loadPersonalChart() {
+            const browserId = getBrowserId();
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getPersonalHistory&browserId=' + browserId);
+                const data = await response.json();
+                
+                if (data.success && data.history && data.history.length >= 3) {
+                    document.getElementById('chartSection').style.display = 'block';
+                    displayPersonalChart(data.history);
+                    loadClassTrend();
+                }
+            } catch (error) {
+                console.error('차트 로드 실패:', error);
+            }
+        }
+        
+        function displayPersonalChart(history) {
+            const moodLabels = {
+                sunny: '🌞 맑음',
+                cloudy: '⛅ 구름 조금',
+                overcast: '☁️ 흐림',
+                rainy: '🌧️ 비',
+                stormy: '⛈️ 폭풍'
+            };
+            
+            const moodColors = {
+                sunny: '#FFD700',
+                cloudy: '#87CEEB',
+                overcast: '#B0C4DE',
+                rainy: '#4682B4',
+                stormy: '#2F4F4F'
+            };
+            
+            let html = '<div style="max-height: 200px; overflow-y: auto;">';
+            
+            history.forEach(record => {
+                const mood = record.mood;
+                const date = new Date(record.date).toLocaleDateString('ko-KR', { 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                
+                html += `
+                    <div class="mood-chart-bar">
+                        <div class="mood-chart-label">
+                            <span>${date}</span>
+                            <span>${moodLabels[mood]}</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 100%; background: ${moodColors[mood]};">
+                                ${moodLabels[mood]}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            document.getElementById('personalChart').innerHTML = html;
+        }
+        
+        async function loadClassTrend() {
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getClassTrend&days=7');
+                const data = await response.json();
+                
+                if (data.success && data.trend) {
+                    displayClassTrend(data.trend);
+                }
+            } catch (error) {
+                console.error('트렌드 로드 실패:', error);
+            }
+        }
+        
+        function displayClassTrend(trend) {
+            const moodLabels = {
+                sunny: '🌞 맑음',
+                cloudy: '⛅ 구름 조금',
+                overcast: '☁️ 흐림',
+                rainy: '🌧️ 비',
+                stormy: '⛈️ 폭풍'
+            };
+            
+            let html = '<div style="background: white; padding: 15px; border-radius: 10px;">';
+            
+            trend.forEach(day => {
+                const date = new Date(day.date).toLocaleDateString('ko-KR', { 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                
+                const total = day.total;
+                const moods = ['sunny', 'cloudy', 'overcast', 'rainy', 'stormy'];
+                const maxMood = moods.reduce((max, mood) => 
+                    day[mood] > day[max] ? mood : max, 'sunny'
+                );
+                
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0;">
+                        <span style="font-size: 13px; color: #666;">${date}</span>
+                        <span style="font-size: 16px;">${moodLabels[maxMood]}</span>
+                        <span style="font-size: 12px; color: #999;">${total}명</span>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            document.getElementById('classTrendChart').innerHTML = html;
+        }
+        
+        async function loadWeeklyReport() {
+            const browserId = getBrowserId();
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getWeeklyReport&browserId=' + browserId);
+                const data = await response.json();
+                
+                if (data.success && data.report.personal.totalDays >= 3) {
+                    document.getElementById('reportSection').style.display = 'block';
+                    displayReport(data.report);
+                }
+            } catch (error) {
+                console.error('리포트 로드 실패:', error);
+            }
+        }
+        
+        function displayReport(report) {
+            const moodLabels = {
+                sunny: '🌞 맑음',
+                cloudy: '⛅ 구름 조금',
+                overcast: '☁️ 흐림',
+                rainy: '🌧️ 비',
+                stormy: '⛈️ 폭풍'
+            };
+            
+            const personal = report.personal;
+            const classData = report.class;
+            
+            let html = `
+                <div class="report-card">
+                    <h4>📅 나의 이번 주 기록</h4>
+                    <div class="report-stat">${personal.totalDays}일 참여</div>
+                    <div class="report-desc">
+                        가장 많이 느낀 감정: <strong>${moodLabels[personal.mostFrequent]}</strong><br>
+                        ${personal.totalDays >= 5 ? '✨ 꾸준히 잘 참여하고 있어요!' : '💡 더 자주 기록해보세요!'}
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <h4>👥 우리 반 이번 주</h4>
+                    <div class="report-stat">${classData.uniqueParticipants}명 참여</div>
+                    <div class="report-desc">
+                        총 ${classData.totalRecords}회 기록<br>
+                        우리 반의 주된 감정: <strong>${moodLabels[classData.mostFrequent]}</strong>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('reportContent').innerHTML = html;
+        }
+        
+        function downloadReport() {
+            alert('리포트 다운로드 기능은 추후 업데이트 예정입니다!');
+        }
+
         async function init() {
             updateVisitData();
             loadDailyQuestion();
             await loadStatsFromServer();
+            
+            // 새로 추가: 차트와 리포트 로드
+            setTimeout(() => {
+                loadPersonalChart();
+                loadWeeklyReport();
+            }, 2000);
         }
 
         init();
