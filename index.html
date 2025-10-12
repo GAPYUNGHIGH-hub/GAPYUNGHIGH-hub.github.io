@@ -236,7 +236,6 @@
             margin-bottom: 12px;
         }
 
-        /* 모바일 최적화: 입력창과 버튼 */
         .message-input-wrapper {
             display: flex;
             flex-direction: column;
@@ -270,6 +269,7 @@
             font-size: 14px;
             font-weight: bold;
             transition: all 0.3s;
+            text-align: center;
         }
 
         .submit-message-btn:hover {
@@ -519,7 +519,6 @@
             color: #bbb;
         }
 
-        /* 데스크톱에서는 가로 배치 */
         @media (min-width: 480px) {
             body {
                 padding: 20px;
@@ -958,18 +957,18 @@
             const savedAnswer = localStorage.getItem(STORAGE_KEYS.DAILY_ANSWER);
             const answerData = savedAnswer ? JSON.parse(savedAnswer) : null;
 
+            const dayOfWeek = new Date().getDay();
+            const question = dailyQuestions[dayOfWeek];
+            document.getElementById('questionText').textContent = question.question;
+
             if (answerData && answerData.date === today) {
+                document.getElementById('questionOptions').classList.add('hidden');
+                
                 setTimeout(async () => {
                     const questionStats = await loadQuestionStatsFromServer();
-                    // 통계가 있으면 무조건 표시 (1명이라도!)
                     showQuestionPrescription(answerData.question, answerData.answer, questionStats);
                 }, 300);
             } else {
-                const dayOfWeek = new Date().getDay();
-                const question = dailyQuestions[dayOfWeek];
-
-                document.getElementById('questionText').textContent = question.question;
-                
                 const optionsContainer = document.getElementById('questionOptions');
                 optionsContainer.innerHTML = '';
                 optionsContainer.classList.remove('hidden');
@@ -1024,7 +1023,6 @@
             const container = document.getElementById('questionResultContainer');
             container.classList.remove('hidden');
             
-            // 통계가 없거나 비어있으면 기본 메시지
             if (!questionStats || Object.keys(questionStats).length === 0) {
                 container.innerHTML = `
                     <div style="background: white; padding: 12px; border-radius: 8px; margin-top: 12px;">
@@ -1035,7 +1033,6 @@
                 return;
             }
 
-            // 통계가 있으면 1명이라도 표시!
             const total = Object.values(questionStats).reduce((a, b) => a + b, 0);
             const sortedStats = Object.entries(questionStats).sort((a, b) => b[1] - a[1]);
             const topAnswer = sortedStats[0];
