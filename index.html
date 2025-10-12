@@ -21,15 +21,15 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
         }
         
         .container {
             max-width: 500px;
             margin: 0 auto;
             background: white;
-            border-radius: 25px;
-            padding: 30px;
+            border-radius: 20px;
+            padding: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             animation: fadeIn 0.5s ease;
         }
@@ -60,25 +60,26 @@
         h1 {
             color: #667eea;
             text-align: center;
-            font-size: 26px;
+            font-size: 22px;
             margin-bottom: 5px;
         }
         
         .subtitle {
             text-align: center;
             color: #666;
-            font-size: 14px;
-            margin-bottom: 20px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            line-height: 1.5;
         }
         
         .streak-badge {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
-            padding: 12px;
-            border-radius: 12px;
+            padding: 10px;
+            border-radius: 10px;
             text-align: center;
-            margin-bottom: 20px;
-            font-size: 14px;
+            margin-bottom: 15px;
+            font-size: 13px;
             font-weight: bold;
         }
         
@@ -86,9 +87,9 @@
             display: inline-block;
             background: #4CAF50;
             color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
             margin-left: 5px;
         }
 
@@ -101,12 +102,12 @@
             color: white;
             padding: 15px;
             border-radius: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         .daily-question h3 {
-            font-size: 16px;
-            margin-bottom: 10px;
+            font-size: 15px;
+            margin-bottom: 8px;
         }
         
         .daily-question .options {
@@ -122,12 +123,12 @@
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 14px;
+            font-size: 13px;
         }
         
-        .daily-question button:hover {
+        .daily-question button:hover:not(:disabled) {
             background: white;
-            transform: translateX(5px);
+            transform: translateX(3px);
         }
 
         .daily-question button:disabled {
@@ -137,22 +138,22 @@
         
         .question h3 {
             color: #333;
-            font-size: 18px;
-            margin-bottom: 15px;
+            font-size: 17px;
+            margin-bottom: 12px;
         }
         
         .options {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         
         button {
-            padding: 14px 18px;
-            font-size: 15px;
+            padding: 12px 15px;
+            font-size: 14px;
             border: 2px solid #667eea;
             background: white;
-            border-radius: 12px;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: left;
@@ -162,7 +163,7 @@
         button:hover:not(:disabled) {
             background: #667eea;
             color: white;
-            transform: translateX(5px);
+            transform: translateX(3px);
         }
 
         button:disabled {
@@ -172,77 +173,79 @@
         
         .stats-section {
             background: #f8f9ff;
-            padding: 20px;
+            padding: 15px;
             border-radius: 12px;
-            margin: 20px 0;
+            margin: 15px 0;
         }
         
         .stats-section h3 {
             color: #667eea;
-            font-size: 16px;
-            margin-bottom: 15px;
+            font-size: 15px;
+            margin-bottom: 12px;
             text-align: center;
         }
         
         .stat-bar {
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         
         .stat-label {
             display: flex;
             justify-content: space-between;
             margin-bottom: 5px;
-            font-size: 14px;
+            font-size: 13px;
         }
         
         .bar-container {
             background: #e0e0e0;
-            height: 25px;
-            border-radius: 12px;
+            height: 22px;
+            border-radius: 11px;
             overflow: hidden;
         }
         
         .bar-fill {
             height: 100%;
             background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 12px;
+            border-radius: 11px;
             transition: width 0.5s ease;
             display: flex;
             align-items: center;
-            padding-left: 10px;
+            padding-left: 8px;
             color: white;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
         }
         
         .total-count {
             text-align: center;
             color: #999;
-            font-size: 13px;
-            margin-top: 10px;
+            font-size: 12px;
+            margin-top: 8px;
         }
         
         .messages-section {
             background: #fff9e6;
-            padding: 20px;
+            padding: 15px;
             border-radius: 12px;
-            margin: 20px 0;
+            margin: 15px 0;
         }
         
         .messages-section h3 {
             color: #f5a623;
-            font-size: 16px;
-            margin-bottom: 15px;
+            font-size: 15px;
+            margin-bottom: 12px;
         }
 
+        /* 모바일 최적화: 입력창과 버튼 */
         .message-input-wrapper {
             display: flex;
+            flex-direction: column;
             gap: 8px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         
         .message-input {
-            flex: 1;
+            width: 100%;
             padding: 12px;
             border: 2px solid #f5a623;
             border-radius: 8px;
@@ -257,7 +260,8 @@
         }
 
         .submit-message-btn {
-            padding: 12px 20px;
+            width: 100%;
+            padding: 12px;
             background: #f5a623;
             color: white;
             border: none;
@@ -266,12 +270,11 @@
             font-size: 14px;
             font-weight: bold;
             transition: all 0.3s;
-            white-space: nowrap;
         }
 
         .submit-message-btn:hover {
             background: #ff9800;
-            transform: translateX(0) scale(1.05);
+            transform: scale(1.02);
         }
 
         .success-message {
@@ -280,7 +283,7 @@
             padding: 10px;
             border-radius: 8px;
             margin-bottom: 10px;
-            font-size: 13px;
+            font-size: 12px;
             text-align: center;
             animation: slideIn 0.3s ease;
         }
@@ -291,30 +294,31 @@
         }
 
         .input-hint {
-            font-size: 12px;
+            font-size: 11px;
             color: #999;
-            margin-top: 5px;
+            margin-top: 3px;
         }
         
         .message-list {
-            max-height: 200px;
+            max-height: 180px;
             overflow-y: auto;
-            margin-top: 15px;
+            margin-top: 12px;
         }
         
         .message-item {
             background: white;
             padding: 10px;
             border-radius: 8px;
-            margin-bottom: 8px;
-            font-size: 13px;
+            margin-bottom: 6px;
+            font-size: 12px;
             color: #555;
             border-left: 3px solid #f5a623;
             animation: fadeIn 0.3s ease;
+            word-break: break-word;
         }
         
         .message-time {
-            font-size: 11px;
+            font-size: 10px;
             color: #999;
             margin-top: 3px;
         }
@@ -326,29 +330,30 @@
         
         .prescription {
             background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%);
-            padding: 20px;
+            padding: 15px;
             border-radius: 12px;
-            margin: 20px 0;
+            margin: 15px 0;
             animation: slideDown 0.5s ease;
             overflow: hidden;
         }
         
         .prescription h3 {
             color: #667eea;
-            margin-bottom: 10px;
-            font-size: 18px;
+            margin-bottom: 8px;
+            font-size: 17px;
         }
         
         .prescription p {
             line-height: 1.6;
             color: #444;
-            margin: 12px 0;
+            margin: 10px 0;
+            font-size: 14px;
         }
         
         .prescription h4 {
             color: #764ba2;
-            margin: 15px 0 8px 0;
-            font-size: 15px;
+            margin: 12px 0 8px 0;
+            font-size: 14px;
         }
         
         .prescription ul {
@@ -357,11 +362,11 @@
         }
         
         .prescription li {
-            padding: 8px 0;
-            padding-left: 20px;
+            padding: 6px 0;
+            padding-left: 18px;
             position: relative;
             line-height: 1.5;
-            font-size: 14px;
+            font-size: 13px;
         }
         
         .prescription li:before {
@@ -374,9 +379,9 @@
 
         .question-prescription {
             background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-            padding: 20px;
+            padding: 15px;
             border-radius: 12px;
-            margin: 15px 0 0 0;
+            margin: 12px 0 0 0;
             border: 2px solid #ff9800;
             animation: slideDown 0.5s ease;
             overflow: hidden;
@@ -384,44 +389,41 @@
 
         .question-prescription h3 {
             color: #f57c00;
-            margin-bottom: 15px;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 16px;
         }
 
         .winner-badge {
             background: linear-gradient(135deg, #ffd700 0%, #ffb300 100%);
             color: #663c00;
-            padding: 12px 15px;
-            border-radius: 10px;
-            margin: 15px 0;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin: 12px 0;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 14px;
             text-align: center;
             box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
         }
 
         .analysis-box {
             background: white;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
-            margin: 15px 0;
+            margin: 12px 0;
             border-left: 4px solid #ff9800;
         }
 
         .analysis-box p {
             color: #666;
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.6;
-            margin: 8px 0;
+            margin: 6px 0;
         }
 
         .question-prescription h4 {
             color: #f57c00;
-            margin: 15px 0 10px 0;
-            font-size: 15px;
+            margin: 12px 0 8px 0;
+            font-size: 14px;
         }
 
         .question-prescription ul {
@@ -430,11 +432,11 @@
         }
 
         .question-prescription li {
-            padding: 8px 0;
-            padding-left: 20px;
+            padding: 6px 0;
+            padding-left: 18px;
             position: relative;
             line-height: 1.5;
-            font-size: 14px;
+            font-size: 12px;
             color: #555;
         }
 
@@ -448,9 +450,9 @@
 
         .loading-indicator {
             background: white;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
-            margin-top: 15px;
+            margin-top: 12px;
             text-align: center;
             animation: slideDown 0.3s ease;
         }
@@ -459,15 +461,15 @@
             border: 3px solid #f3f3f3;
             border-top: 3px solid #667eea;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 10px auto;
+            margin: 0 auto 8px auto;
         }
 
         .loading-indicator p {
             color: #667eea;
-            font-size: 13px;
+            font-size: 12px;
         }
         
         .reset-btn {
@@ -475,14 +477,14 @@
             background: #667eea;
             color: white;
             border: none;
-            padding: 14px;
-            font-size: 15px;
-            margin-top: 15px;
+            padding: 12px;
+            font-size: 14px;
+            margin-top: 12px;
         }
         
         .reset-btn:hover {
             background: #764ba2;
-            transform: translateX(0) scale(1.02);
+            transform: scale(1.02);
         }
         
         .hidden {
@@ -491,29 +493,69 @@
         
         .footer {
             text-align: center;
-            margin-top: 15px;
-            font-size: 12px;
+            margin-top: 12px;
+            font-size: 11px;
             color: #999;
+            line-height: 1.5;
         }
 
         .creator-info {
             text-align: center;
             color: #999;
-            font-size: 11px;
-            margin-top: 30px;
-            padding: 20px 0;
+            font-size: 10px;
+            margin-top: 20px;
+            padding: 15px 0;
             border-top: 1px solid #f0f0f0;
         }
 
         .creator-info .title {
-            font-size: 12px;
+            font-size: 11px;
             color: #667eea;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .creator-info .details {
-            font-size: 10px;
+            font-size: 9px;
             color: #bbb;
+        }
+
+        /* 데스크톱에서는 가로 배치 */
+        @media (min-width: 480px) {
+            body {
+                padding: 20px;
+            }
+
+            .container {
+                padding: 30px;
+                border-radius: 25px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            .subtitle {
+                font-size: 14px;
+            }
+
+            .message-input-wrapper {
+                flex-direction: row;
+                gap: 8px;
+            }
+
+            .message-input {
+                flex: 1;
+            }
+
+            .submit-message-btn {
+                width: auto;
+                padding: 12px 20px;
+                white-space: nowrap;
+            }
+
+            .submit-message-btn:hover {
+                transform: translateX(0) scale(1.05);
+            }
         }
     </style>
 </head>
@@ -526,7 +568,7 @@
 
         <div class="daily-question">
             <h3>📅 오늘의 질문</h3>
-            <p id="questionText" style="margin-bottom: 10px; font-size: 14px;"></p>
+            <p id="questionText" style="margin-bottom: 8px; font-size: 13px;"></p>
             <div class="options" id="questionOptions"></div>
             <div id="questionLoadingContainer" class="hidden"></div>
             <div id="questionResultContainer" class="hidden"></div>
@@ -579,7 +621,7 @@
             </div>
             <p class="input-hint">💡 엔터 키를 눌러도 등록됩니다</p>
             
-            <h4 style="font-size: 14px; color: #666; margin-top: 20px;">최근 친구들의 한마디</h4>
+            <h4 style="font-size: 13px; color: #666; margin-top: 15px;">최근 친구들의 한마디</h4>
             <div class="message-list" id="messageList">
                 <div class="loading">메시지 불러오는 중...</div>
             </div>
@@ -807,7 +849,7 @@
         function displayMessages(messages) {
             if (!messages || messages.length === 0) {
                 document.getElementById('messageList').innerHTML = 
-                    '<p style="text-align: center; color: #999; font-size: 13px;">아직 메시지가 없어요. 첫 번째 메시지를 남겨보세요!</p>';
+                    '<p style="text-align: center; color: #999; font-size: 12px;">아직 메시지가 없어요. 첫 번째 메시지를 남겨보세요!</p>';
                 return;
             }
 
@@ -919,28 +961,26 @@
             if (answerData && answerData.date === today) {
                 setTimeout(async () => {
                     const questionStats = await loadQuestionStatsFromServer();
-                    if (questionStats && Object.keys(questionStats).length > 0) {
-                        showQuestionPrescription(answerData.question, answerData.answer, questionStats);
-                        return;
-                    }
+                    // 통계가 있으면 무조건 표시 (1명이라도!)
+                    showQuestionPrescription(answerData.question, answerData.answer, questionStats);
                 }, 300);
+            } else {
+                const dayOfWeek = new Date().getDay();
+                const question = dailyQuestions[dayOfWeek];
+
+                document.getElementById('questionText').textContent = question.question;
+                
+                const optionsContainer = document.getElementById('questionOptions');
+                optionsContainer.innerHTML = '';
+                optionsContainer.classList.remove('hidden');
+                
+                question.options.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.textContent = option;
+                    btn.onclick = () => answerDailyQuestion(question.question, option);
+                    optionsContainer.appendChild(btn);
+                });
             }
-
-            const dayOfWeek = new Date().getDay();
-            const question = dailyQuestions[dayOfWeek];
-
-            document.getElementById('questionText').textContent = question.question;
-            
-            const optionsContainer = document.getElementById('questionOptions');
-            optionsContainer.innerHTML = '';
-            optionsContainer.classList.remove('hidden');
-            
-            question.options.forEach(option => {
-                const btn = document.createElement('button');
-                btn.textContent = option;
-                btn.onclick = () => answerDailyQuestion(question.question, option);
-                optionsContainer.appendChild(btn);
-            });
         }
 
         async function answerDailyQuestion(question, answer) {
@@ -952,11 +992,9 @@
                 answer: answer
             }));
 
-            // 버튼 비활성화
             const buttons = document.getElementById('questionOptions').querySelectorAll('button');
             buttons.forEach(btn => btn.disabled = true);
 
-            // 로딩 표시
             const loadingContainer = document.getElementById('questionLoadingContainer');
             loadingContainer.innerHTML = `
                 <div class="loading-indicator">
@@ -972,17 +1010,12 @@
                 browserId: getBrowserId()
             });
 
-            // 0.8초 대기 후 통계 로드
             setTimeout(async () => {
                 const questionStats = await loadQuestionStatsFromServer();
                 
-                // 로딩 숨기기
                 loadingContainer.classList.add('hidden');
-                
-                // 버튼 완전히 숨기기
                 document.getElementById('questionOptions').classList.add('hidden');
                 
-                // 처방전 표시
                 showQuestionPrescription(question, answer, questionStats);
             }, 800);
         }
@@ -991,16 +1024,18 @@
             const container = document.getElementById('questionResultContainer');
             container.classList.remove('hidden');
             
+            // 통계가 없거나 비어있으면 기본 메시지
             if (!questionStats || Object.keys(questionStats).length === 0) {
                 container.innerHTML = `
-                    <div style="background: white; padding: 15px; border-radius: 8px; margin-top: 15px;">
-                        <h4 style="color: #667eea; font-size: 14px; margin-bottom: 10px;">당신의 선택: "${answer}"</h4>
-                        <p style="font-size: 12px; color: #666;">답변이 저장되었습니다! 다른 친구들의 답변이 모이면 통계를 보여드릴게요.</p>
+                    <div style="background: white; padding: 12px; border-radius: 8px; margin-top: 12px;">
+                        <h4 style="color: #667eea; font-size: 13px; margin-bottom: 8px;">당신의 선택: "${answer}"</h4>
+                        <p style="font-size: 11px; color: #666;">답변이 저장되었습니다! 다른 친구들의 답변이 모이면 통계를 보여드릴게요.</p>
                     </div>
                 `;
                 return;
             }
 
+            // 통계가 있으면 1명이라도 표시!
             const total = Object.values(questionStats).reduce((a, b) => a + b, 0);
             const sortedStats = Object.entries(questionStats).sort((a, b) => b[1] - a[1]);
             const topAnswer = sortedStats[0];
@@ -1020,7 +1055,7 @@
                     </div>
 
                     <div class="analysis-box">
-                        <p><strong>💭 우리 반의 마음:</strong></p>
+                        <p><strong>💭 ${total === 1 ? '당신의 선택' : '우리 반의 마음'}:</strong></p>
                         <p>${analysis.message}</p>
                     </div>
 
@@ -1032,7 +1067,7 @@
                 const isYourChoice = opt === answer;
                 const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '  ';
                 html += `
-                    <div style="background: ${isYourChoice ? '#e8f5e9' : 'white'}; padding: 8px; margin: 5px 0; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; border: 1px solid #e0e0e0;">
+                    <div style="background: ${isYourChoice ? '#e8f5e9' : 'white'}; padding: 8px; margin: 5px 0; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; border: 1px solid #e0e0e0;">
                         <span style="font-weight: ${isYourChoice ? 'bold' : 'normal'};">${medal} ${opt}${isYourChoice ? ' ✓' : ''}</span>
                         <span style="color: #f57c00; font-weight: bold;">${percent}% (${count}명)</span>
                     </div>
@@ -1057,7 +1092,6 @@
         async function selectMood(mood) {
             const visitData = JSON.parse(localStorage.getItem(STORAGE_KEYS.VISIT_DATA)) || {};
 
-            // 버튼 비활성화
             const buttons = document.getElementById('moodOptions').querySelectorAll('button');
             buttons.forEach(btn => btn.disabled = true);
 
@@ -1073,7 +1107,6 @@
 
             setTimeout(() => {
                 loadStatsFromServer();
-                // 버튼 다시 활성화
                 buttons.forEach(btn => btn.disabled = false);
             }, 1000);
         }
