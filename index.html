@@ -51,6 +51,11 @@
                 transform: translateY(0);
             }
         }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         
         h1 {
             color: #667eea;
@@ -124,6 +129,11 @@
             background: white;
             transform: translateX(5px);
         }
+
+        .daily-question button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
         
         .question h3 {
             color: #333;
@@ -149,7 +159,7 @@
             color: #333;
         }
         
-        button:hover {
+        button:hover:not(:disabled) {
             background: #667eea;
             color: white;
             transform: translateX(5px);
@@ -435,6 +445,30 @@
             color: #ff9800;
             font-weight: bold;
         }
+
+        .loading-indicator {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            animation: slideDown 0.3s ease;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px auto;
+        }
+
+        .loading-indicator p {
+            color: #667eea;
+            font-size: 13px;
+        }
         
         .reset-btn {
             width: 100%;
@@ -481,26 +515,6 @@
             font-size: 10px;
             color: #bbb;
         }
-
-        .question-result {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-
-        .question-result h4 {
-            color: #667eea;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        .loading {
-            text-align: center;
-            color: #667eea;
-            padding: 10px;
-            font-size: 13px;
-        }
     </style>
 </head>
 <body>
@@ -514,6 +528,7 @@
             <h3>📅 오늘의 질문</h3>
             <p id="questionText" style="margin-bottom: 10px; font-size: 14px;"></p>
             <div class="options" id="questionOptions"></div>
+            <div id="questionLoadingContainer" class="hidden"></div>
             <div id="questionResultContainer" class="hidden"></div>
         </div>
 
@@ -522,18 +537,10 @@
             지금 이 순간의 마음을 체크하고<br>
             맞춤 처방을 받아보세요
         </p>
-        
-        <div class="stats-section">
-            <h3>📊 실시간 우리 반 마음 날씨</h3>
-            <div id="statsContainer">
-                <div class="loading">통계 불러오는 중...</div>
-            </div>
-            <p class="total-count">총 <span id="totalParticipants">0</span>명 참여 중</p>
-        </div>
 
         <div class="question">
             <h3>지금 이 순간, 당신의 마음은?</h3>
-            <div class="options">
+            <div class="options" id="moodOptions">
                 <button onclick="selectMood('sunny')">🌞 맑음 - 기분 좋고 에너지가 충만</button>
                 <button onclick="selectMood('cloudy')">⛅ 구름 조금 - 괜찮은데 약간 피곤함</button>
                 <button onclick="selectMood('overcast')">☁️ 흐림 - 답답하고 무기력함</button>
@@ -542,8 +549,15 @@
             </div>
         </div>
 
-        <!-- 처방전 영역 (버튼 아래에 표시됨) -->
         <div id="prescriptionContainer" class="hidden"></div>
+
+        <div class="stats-section">
+            <h3>📊 실시간 우리 반 마음 날씨</h3>
+            <div id="statsContainer">
+                <div class="loading">통계 불러오는 중...</div>
+            </div>
+            <p class="total-count">총 <span id="totalParticipants">0</span>명 참여 중</p>
+        </div>
 
         <div class="messages-section">
             <h3>💬 익명의 한마디 (선택)</h3>
@@ -665,7 +679,7 @@
                 "네 편이야": { message: "외롭고 혼자라는 느낌이 드나봐요", advice: ["주변 사람들과 가벼운 대화 시도하기", "당신은 혼자가 아니에요"] }
             },
             "지금 가장 하고 싶은 것은?": {
-                "푹 자기": { message: "많이 피곤한가봐요", advice: ["충분한 수면 취하기", "오늘은 일찍 자기", "낮잠 15분"] },
+                "푹 자기": { message: "많이 피곤한가봐요", advice: ["충분한 수면 취하기", "오늘은 일찍 자기"] },
                 "맛있는 것 먹기": { message: "작은 행복이 필요한 순간", advice: ["좋아하는 간식 먹기", "맛있는 음식으로 기분 전환"] },
                 "친구랑 놀기": { message: "사람들과의 연결이 필요해요", advice: ["친구에게 먼저 연락하기", "함께할 시간 만들기"] },
                 "혼자 있기": { message: "혼자만의 시간이 필요해요", advice: ["조용한 공간에서 쉬기", "나만의 시간 갖기"] },
@@ -909,7 +923,7 @@
                         showQuestionPrescription(answerData.question, answerData.answer, questionStats);
                         return;
                     }
-                }, 500);
+                }, 300);
             }
 
             const dayOfWeek = new Date().getDay();
@@ -938,20 +952,39 @@
                 answer: answer
             }));
 
+            // 버튼 비활성화
+            const buttons = document.getElementById('questionOptions').querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            // 로딩 표시
+            const loadingContainer = document.getElementById('questionLoadingContainer');
+            loadingContainer.innerHTML = `
+                <div class="loading-indicator">
+                    <div class="spinner"></div>
+                    <p>분석 중...</p>
+                </div>
+            `;
+            loadingContainer.classList.remove('hidden');
+
             await sendToGoogleSheets('saveQuestion', {
                 question: question,
                 answer: answer,
                 browserId: getBrowserId()
             });
 
-            // 버튼 숨기기
-            document.getElementById('questionOptions').classList.add('hidden');
-
-            // 1초 대기 후 통계 로드
+            // 0.8초 대기 후 통계 로드
             setTimeout(async () => {
                 const questionStats = await loadQuestionStatsFromServer();
+                
+                // 로딩 숨기기
+                loadingContainer.classList.add('hidden');
+                
+                // 버튼 완전히 숨기기
+                document.getElementById('questionOptions').classList.add('hidden');
+                
+                // 처방전 표시
                 showQuestionPrescription(question, answer, questionStats);
-            }, 1500);
+            }, 800);
         }
 
         function showQuestionPrescription(question, answer, questionStats) {
@@ -962,7 +995,7 @@
                 container.innerHTML = `
                     <div style="background: white; padding: 15px; border-radius: 8px; margin-top: 15px;">
                         <h4 style="color: #667eea; font-size: 14px; margin-bottom: 10px;">당신의 선택: "${answer}"</h4>
-                        <p style="font-size: 12px; color: #666;">답변이 저장되었습니다!</p>
+                        <p style="font-size: 12px; color: #666;">답변이 저장되었습니다! 다른 친구들의 답변이 모이면 통계를 보여드릴게요.</p>
                     </div>
                 `;
                 return;
@@ -1016,7 +1049,6 @@
 
             container.innerHTML = html;
             
-            // 부드럽게 스크롤
             setTimeout(() => {
                 container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 100);
@@ -1024,6 +1056,10 @@
 
         async function selectMood(mood) {
             const visitData = JSON.parse(localStorage.getItem(STORAGE_KEYS.VISIT_DATA)) || {};
+
+            // 버튼 비활성화
+            const buttons = document.getElementById('moodOptions').querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = true);
 
             await sendToGoogleSheets('saveMood', {
                 mood: mood,
@@ -1035,7 +1071,11 @@
 
             showPrescription(mood);
 
-            setTimeout(() => loadStatsFromServer(), 1000);
+            setTimeout(() => {
+                loadStatsFromServer();
+                // 버튼 다시 활성화
+                buttons.forEach(btn => btn.disabled = false);
+            }, 1000);
         }
 
         function showPrescription(mood) {
@@ -1059,7 +1099,6 @@
             container.innerHTML = html;
             container.classList.remove('hidden');
             
-            // 부드럽게 스크롤
             setTimeout(() => {
                 container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 100);
@@ -1069,7 +1108,6 @@
             document.getElementById('prescriptionContainer').classList.add('hidden');
             document.getElementById('prescriptionContainer').innerHTML = '';
             
-            // 페이지 맨 위로 부드럽게 스크롤
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
