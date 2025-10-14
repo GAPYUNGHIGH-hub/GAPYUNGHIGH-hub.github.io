@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우리 반 마음 프로젝트</title>
+    <meta name="description" content="우리 반 익명 심리 체크 & 맞춤 처방 프로젝트">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F8F9FA; 
+            color: #333;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 150px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 150px;
+            max-height: 150px;
+        }
+        .flow-line::after {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 20px;
+            background-color: #9CDD05;
+            margin: 8px auto;
+            border-radius: 2px;
+        }
+        .a4-container {
+            max-width: 210mm;
+            max-height: 297mm;
+            padding: 10px;
+        }
+
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+            body {
+                background-color: white !important;
+                font-size: 85%;
+            }
+            .a4-container {
+                padding: 10mm;
+            }
+            header, section, footer, div {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .mb-8 { margin-bottom: 0.5rem !important; }
+            .mt-6 { margin-top: 0.5rem !important; }
+            .mb-6 { margin-bottom: 0.5rem !important; }
+            .my-8 { margin-top: 0.5rem !important; margin-bottom: 0.5rem !important; }
+            
+            h1 { font-size: 22pt !important; }
+            h2 { font-size: 14pt !important; }
+            h3 { font-size: 12pt !important; }
+            p { font-size: 9pt !important; }
+
+            .gap-4 { gap: 0.5rem !important; }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="a4-container mx-auto p-2">
+
+        <header class="text-center mt-6 mb-8">
+            <h1 class="text-3xl md:text-4xl font-black text-[#E94E77] mb-2">⚡️ 딱 1분! 내 마음의 충전이 필요할 때 ⚡️</h1>
+            <p class="text-md md:text-lg text-gray-700 font-medium">우리 반 익명 심리 체크 & 맞춤 처방 프로젝트</p>
+        </header>
+
+        <section id="cta" class="bg-white p-6 rounded-xl shadow-lg text-center mb-8 border-4 border-[#4A90E2]">
+            <h2 class="text-2xl md:text-3xl font-extrabold text-[#4A90E2] mb-4">지금 바로 참여해보세요!</h2>
+            
+            <!-- ⭐ QR 이미지 경로 -->
+            <img src="./assets/1SGVp.jpg"
+                 alt="마음처방전 QR코드"
+                 class="w-48 h-48 mx-auto border-4 border-[#00B3A0] rounded-xl object-contain bg-white mb-4 p-2"
+                 onerror="this.onerror=null; this.src='assets/1SGVp.jpg';" />         
+            <p class="text-md font-bold text-[#E94E77]">🔗 URL: https://m.site.naver.com/1SGVp</p>
+            <p class="text-sm text-gray-600 mt-2">QR코드를 스캔하여 1분 만에 마음을 체크하세요!</p>
+        </section>
+
+        <section id="process" class="mb-8">
+            <h2 class="text-xl font-bold text-center text-[#4A90E2] mb-6">3단계로 끝! 참여는 아주 간단해요!</h2>
+            <div class="flex justify-center text-center">
+                <div class="flex flex-col items-center mx-3">
+                    <div class="bg-white p-4 rounded-full shadow-md border-2 border-[#9CDD05] w-24 h-24 flex items-center justify-center">
+                        <p class="text-3xl">🤔</p>
+                    </div>
+                    <div class="flow-line"></div>
+                    <p class="font-bold text-sm">1. 기분 선택</p>
+                </div>
+                <div class="flex flex-col items-center mx-3">
+                    <div class="bg-white p-4 rounded-full shadow-md border-2 border-[#9CDD05] w-24 h-24 flex items-center justify-center">
+                        <p class="text-3xl">💊</p>
+                    </div>
+                     <div class="flow-line"></div>
+                    <p class="font-bold text-sm">2. 처방 확인</p>
+                </div>
+                <div class="flex flex-col items-center mx-3">
+                    <div class="bg-white p-4 rounded-full shadow-md border-2 border-[#9CDD05] w-24 h-24 flex items-center justify-center">
+                        <p class="text-3xl">💌</p>
+                    </div>
+                    <div class="flow-line"></div>
+                    <p class="font-bold text-sm">3. 익명 메시지</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="features_and_purpose" class="mb-8">
+            <h2 class="text-xl font-bold text-center text-[#4A90E2] mb-6">나에게 힘이 되는 세 가지 이유</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <div class="bg-white p-4 rounded-xl shadow-md border-l-4 border-[#FFC107]">
+                    <p class="text-3xl mb-1">🔒</p>
+                    <h3 class="text-md font-bold mb-1">100% 익명 보장</h3>
+                    <p class="text-xs text-gray-600">개인정보 수집 없이 안전하게 마음을 표현하세요.</p>
+                </div>
+                
+                <div class="bg-white p-4 rounded-xl shadow-md border-l-4 border-[#4A90E2]">
+                    <p class="text-3xl mb-1">💖</p>
+                    <h3 class="text-md font-bold mb-1">마음 근력 강화</h3>
+                    <p class="text-xs text-gray-600">내 기분에 맞는 조언을 받고 스스로를 돌보는 습관을 만들어요.</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-md border-l-4 border-[#00B3A0]">
+                    <p class="text-3xl mb-1">🫂</p>
+                    <h3 class="text-md font-bold mb-1">따뜻한 학급 만들기</h3>
+                    <p class="text-xs text-gray-600">우리 반 마음 날씨를 공유하고, 공감하며 서로를 지지해요.</p>
+                </div>
+            </div>
+        </section>
+        
+        <footer class="text-center mt-6 text-gray-500">
+            <p class="text-xs">우리 반 마음 프로젝트 | 기획 및 관리: 마음 건강 도우미 남소영</p>
+        </footer>
+    </div>
+
+    <script>
+        const miniDonutCtx = document.getElementById('miniDonutChart')?.getContext('2d');
+        if (miniDonutCtx) {
+             new Chart(miniDonutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['맑음', '구름 조금', '흐림', '비/폭풍'],
+                    datasets: [{
+                        label: '마음 날씨',
+                        data: [3, 6, 2, 3],
+                        backgroundColor: [
+                            '#FFC107',
+                            '#4A90E2',
+                            '#A0AEC0',
+                            '#E94E77'
+                        ],
+                        borderColor: '#FFFFFF',
+                        borderWidth: 3,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    const item = tooltipItems[0];
+                                    let label = item.chart.data.labels[item.dataIndex];
+                                    if (Array.isArray(label)) {
+                                      return label.join(' ');
+                                    } else {
+                                      return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
