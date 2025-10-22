@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>오늘의 마음 처방전</title>
     <script>
-        // ⚠️⚠️⚠️ 여기에 본인의 Google Script URL을 붙여넣으세요! ⚠️⚠️⚠️
-        
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzhGE9YVXjXBEF1WmXd_-PEHMoS1QgCIbxXq3HcgjuKu7-EkDzhxTB89u6i7LmFzhXOQg/exec';
-        
     </script>
     <style>
         * {
@@ -38,20 +35,12 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
+        
         @keyframes slideDown {
-            from { 
-                opacity: 0; 
-                max-height: 0;
-                transform: translateY(-20px);
-            }
-            to { 
-                opacity: 1; 
-                max-height: 2000px;
-                transform: translateY(0);
-            }
+            from { opacity: 0; max-height: 0; transform: translateY(-20px); }
+            to { opacity: 1; max-height: 2000px; transform: translateY(0); }
         }
-
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -92,7 +81,7 @@
             font-size: 10px;
             margin-left: 5px;
         }
-
+        
         .sync-badge.offline {
             background: #ff9800;
         }
@@ -122,7 +111,7 @@
             padding: 10px;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             font-size: 13px;
         }
         
@@ -130,7 +119,7 @@
             background: white;
             transform: translateX(3px);
         }
-
+        
         .daily-question button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
@@ -165,7 +154,7 @@
             color: white;
             transform: translateX(3px);
         }
-
+        
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -235,7 +224,7 @@
             font-size: 15px;
             margin-bottom: 12px;
         }
-
+        
         .message-input-wrapper {
             display: flex;
             flex-direction: column;
@@ -251,13 +240,13 @@
             font-size: 14px;
             font-family: inherit;
         }
-
+        
         .message-input:focus {
             outline: none;
             border-color: #ff9800;
             box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1);
         }
-
+        
         .submit-message-btn {
             width: 100%;
             padding: 12px;
@@ -271,12 +260,12 @@
             transition: all 0.3s;
             text-align: center;
         }
-
+        
         .submit-message-btn:hover {
             background: #ff9800;
             transform: scale(1.02);
         }
-
+        
         .success-message {
             background: #4CAF50;
             color: white;
@@ -287,12 +276,12 @@
             text-align: center;
             animation: slideIn 0.3s ease;
         }
-
+        
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
+        
         .input-hint {
             font-size: 11px;
             color: #999;
@@ -322,7 +311,7 @@
             color: #999;
             margin-top: 3px;
         }
-
+        
         .message-item.new {
             background: #fffbf0;
             border-left: 3px solid #ff9800;
@@ -376,7 +365,7 @@
             color: #667eea;
             font-weight: bold;
         }
-
+        
         .question-prescription {
             background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
             padding: 15px;
@@ -386,13 +375,13 @@
             animation: slideDown 0.5s ease;
             overflow: hidden;
         }
-
+        
         .question-prescription h3 {
             color: #f57c00;
             margin-bottom: 12px;
             font-size: 16px;
         }
-
+        
         .winner-badge {
             background: linear-gradient(135deg, #ffd700 0%, #ffb300 100%);
             color: #663c00;
@@ -404,7 +393,7 @@
             text-align: center;
             box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
         }
-
+        
         .analysis-box {
             background: white;
             padding: 12px;
@@ -412,25 +401,25 @@
             margin: 12px 0;
             border-left: 4px solid #ff9800;
         }
-
+        
         .analysis-box p {
             color: #666;
             font-size: 13px;
             line-height: 1.6;
             margin: 6px 0;
         }
-
+        
         .question-prescription h4 {
             color: #f57c00;
             margin: 12px 0 8px 0;
             font-size: 14px;
         }
-
+        
         .question-prescription ul {
             list-style: none;
             padding: 0;
         }
-
+        
         .question-prescription li {
             padding: 6px 0;
             padding-left: 18px;
@@ -439,7 +428,7 @@
             font-size: 12px;
             color: #555;
         }
-
+        
         .question-prescription li:before {
             content: "✓";
             position: absolute;
@@ -447,7 +436,7 @@
             color: #ff9800;
             font-weight: bold;
         }
-
+        
         .loading-indicator {
             background: white;
             padding: 15px;
@@ -456,20 +445,37 @@
             text-align: center;
             animation: slideDown 0.3s ease;
         }
-
+        
         .spinner {
             border: 3px solid #f3f3f3;
             border-top: 3px solid #667eea;
             border-radius: 50%;
             width: 25px;
             height: 25px;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
             margin: 0 auto 8px auto;
         }
-
+        
         .loading-indicator p {
             color: #667eea;
             font-size: 12px;
+            margin: 8px 0 4px 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            transition: width 0.2s ease;
+            width: 0%;
         }
         
         .reset-btn {
@@ -498,7 +504,7 @@
             color: #999;
             line-height: 1.5;
         }
-
+        
         .creator-info {
             text-align: center;
             color: #999;
@@ -507,19 +513,18 @@
             padding: 15px 0;
             border-top: 1px solid #f0f0f0;
         }
-
+        
         .creator-info .title {
             font-size: 11px;
             color: #667eea;
             margin-bottom: 4px;
         }
-
+        
         .creator-info .details {
             font-size: 9px;
             color: #bbb;
         }
-
-        /* 차트 및 리포트 섹션 스타일 */
+        
         .chart-section, .report-section {
             background: #f8f9ff;
             padding: 15px;
@@ -571,55 +576,29 @@
             color: #666;
             line-height: 1.5;
         }
-
+        
         @media (min-width: 480px) {
-            body {
-                padding: 20px;
-            }
-
-            .container {
-                padding: 30px;
-                border-radius: 25px;
-            }
-
-            h1 {
-                font-size: 26px;
-            }
-
-            .subtitle {
-                font-size: 14px;
-            }
-
-            .message-input-wrapper {
-                flex-direction: row;
-                gap: 8px;
-            }
-
-            .message-input {
-                flex: 1;
-            }
-
-            .submit-message-btn {
-                width: auto;
-                padding: 12px 20px;
-                white-space: nowrap;
-            }
-
-            .submit-message-btn:hover {
-                transform: translateX(0) scale(1.05);
-            }
+            body { padding: 20px; }
+            .container { padding: 30px; border-radius: 25px; }
+            h1 { font-size: 26px; }
+            .subtitle { font-size: 14px; }
+            .message-input-wrapper { flex-direction: row; gap: 8px; }
+            .message-input { flex: 1; }
+            .submit-message-btn { width: auto; padding: 12px 20px; white-space: nowrap; }
+            .submit-message-btn:hover { transform: translateX(0) scale(1.05); }
         }
     </style>
 </head>
-<body>
+
+  <body>
     <div class="container">
         <div class="streak-badge">
             🔥 연속 방문: <span id="streakDays">1</span>일 | 총 방문: <span id="totalVisits">1</span>회
-            <span class="sync-badge" id="syncBadge">☁️ 동기화</span>
+            <span class="sync-badge" id="syncBadge">☁️동기화</span>
         </div>
 
         <div class="daily-question">
-            <h3>📅 오늘의 질문</h3>
+            <h3>📋 오늘의 질문</h3>
             <p id="questionText" style="margin-bottom: 8px; font-size: 13px;"></p>
             <div class="options" id="questionOptions"></div>
             <div id="questionLoadingContainer" class="hidden"></div>
@@ -635,7 +614,7 @@
         <div class="question">
             <h3>지금 이 순간, 당신의 마음은?</h3>
             <div class="options" id="moodOptions">
-                <button onclick="selectMood('sunny')">🌞 맑음 - 기분 좋고 에너지가 충만</button>
+                <button onclick="selectMood('sunny')">☀️ 맑음 - 기분 좋고 에너지가 충만</button>
                 <button onclick="selectMood('cloudy')">⛅ 구름 조금 - 괜찮은데 약간 피곤함</button>
                 <button onclick="selectMood('overcast')">☁️ 흐림 - 답답하고 무기력함</button>
                 <button onclick="selectMood('rainy')">🌧️ 비 - 힘들고 우울함</button>
@@ -653,7 +632,6 @@
             <p class="total-count">총 <span id="totalParticipants">0</span>명 참여 중</p>
         </div>
 
-        <!-- 📈 나의 마음 그래프 섹션 -->
         <div class="chart-section" id="chartSection" style="display: none;">
             <h3>📈 나의 마음 변화</h3>
             <p style="text-align: center; font-size: 12px; color: #999; margin-bottom: 15px;">
@@ -671,9 +649,8 @@
             </div>
         </div>
 
-        <!-- 📊 주간 리포트 섹션 -->
         <div class="report-section" id="reportSection" style="display: none;">
-            <h3>📊 나의 주간 리포트</h3>
+            <h3>📋 나의 주간 리포트</h3>
             <div id="reportContent" style="margin: 15px 0;">
                 <p style="text-align: center; color: #999; font-size: 13px;">
                     데이터를 불러오는 중...
@@ -699,10 +676,10 @@
                        maxlength="50"
                        onkeypress="handleMessageKeyPress(event)">
                 <button class="submit-message-btn" onclick="submitMessage()">
-                    등록
+                    💬 등록
                 </button>
             </div>
-            <p class="input-hint">💡 엔터 키를 눌러도 등록됩니다</p>
+            <p class="input-hint">↩️ 엔터 키를 눌러도 등록됩니다</p>
             
             <h4 style="font-size: 13px; color: #666; margin-top: 15px;">최근 친구들의 한마디</h4>
             <div class="message-list" id="messageList">
@@ -734,7 +711,7 @@
 
         const prescriptions = {
             sunny: {
-                title: "💙 에너지 넘치는 당신",
+                title: "☀️ 에너지 넘치는 당신",
                 message: "멋진 하루네요! 이 긍정적인 에너지를 친구들과 나눠보는 건 어떨까요?",
                 activities: [
                     "친구에게 먼저 웃으며 인사하기",
@@ -744,7 +721,7 @@
                 ]
             },
             cloudy: {
-                title: "💙 조금 지친 당신",
+                title: "⛅ 조금 지친 당신",
                 message: "괜찮아요. 잠깐 쉬어가도 돼요. 무리하지 마세요.",
                 activities: [
                     "창문 밖 하늘 보며 깊게 숨쉬기 3회",
@@ -754,7 +731,7 @@
                 ]
             },
             overcast: {
-                title: "💙 힘든 하루를 보내는 당신",
+                title: "☁️ 힘든 하루를 보내는 당신",
                 message: "지금 충분히 잘하고 있어요. 오늘 하루 버틴 것만으로도 대단해요.",
                 activities: [
                     "좋아하는 노래 1~2곡 듣기",
@@ -764,7 +741,7 @@
                 ]
             },
             rainy: {
-                title: "💙 많이 힘든 당신",
+                title: "🌧️ 많이 힘든 당신",
                 message: "정말 힘들었겠어요. 혼자가 아니에요. 괜찮아질 거예요.",
                 activities: [
                     "가장 편한 사람과 대화하기",
@@ -774,13 +751,13 @@
                 ]
             },
             stormy: {
-                title: "💙 지금 당장 도움이 필요한 당신",
+                title: "⛈️ 지금 당장 도움이 필요한 당신",
                 message: "혼자 견디지 마세요. 주변에 도움을 요청해도 괜찮아요.",
                 activities: [
-                    "📞 가장 믿을 수 있는 사람에게 연락하기",
-                    "💬 학교 상담실 방문하기",
-                    "📱 청소년 상담전화 1388",
-                    "🏥 정신건강 위기상담 1577-0199"
+                    "🚨 가장 믿을 수 있는 사람에게 연락하기",
+                    "🏥 학교 상담실 방문하기",
+                    "📞 청소년 상담전화 1388",
+                    "☎️ 정신건강 위기상담 1577-0199"
                 ]
             }
         };
@@ -795,7 +772,7 @@
             { question: "내가 가장 행복한 순간은?", options: ["친구랑 있을 때", "혼자 쉴 때", "좋아하는 것 할 때", "성취감 느낄 때", "맛있는 것 먹을 때"] }
         ];
 
-        const questionAnalysis = {
+      const questionAnalysis = {
             "요즘 가장 듣고 싶은 말은?": {
                 "고생했어": { message: "인정받고 싶은 마음이 크네요", advice: ["자신에게 '오늘도 고생했어' 말해주기", "작은 성취에도 스스로 칭찬하기"] },
                 "잘하고 있어": { message: "지금 조금 불안한가봐요", advice: ["지금까지 잘 해왔다는 것 인정하기", "완벽하지 않아도 괜찮아요"] },
@@ -899,7 +876,7 @@
 
         function displayStats(moodCounts, total) {
             const moodLabels = {
-                sunny: '🌞 맑음',
+                sunny: '☀️ 맑음',
                 cloudy: '⛅ 구름 조금',
                 overcast: '☁️ 흐림',
                 rainy: '🌧️ 비',
@@ -954,10 +931,10 @@
         function updateSyncBadge(success) {
             const badge = document.getElementById('syncBadge');
             if (success) {
-                badge.textContent = '☁️ 동기화됨';
+                badge.textContent = '☁️동기화됨';
                 badge.classList.remove('offline');
             } else {
-                badge.textContent = '⚠️ 오프라인';
+                badge.textContent = '⚠️오프라인';
                 badge.classList.add('offline');
             }
         }
@@ -1043,6 +1020,7 @@
 
             const dayOfWeek = new Date().getDay();
             const question = dailyQuestions[dayOfWeek];
+
             document.getElementById('questionText').textContent = question.question;
 
             if (answerData && answerData.date === today) {
@@ -1066,6 +1044,7 @@
             }
         }
 
+        // ⚡ 최적화: 분석 시간 단축 (800ms → 300ms) + 프로그레스 바
         async function answerDailyQuestion(question, answer) {
             const today = new Date().toDateString();
             
@@ -1082,28 +1061,53 @@
             loadingContainer.innerHTML = `
                 <div class="loading-indicator">
                     <div class="spinner"></div>
-                    <p>분석 중...</p>
+                    <p id="loadingText">분석 중...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
                 </div>
             `;
             loadingContainer.classList.remove('hidden');
 
-            await sendToGoogleSheets('saveQuestion', {
-                question: question,
-                answer: answer,
-                browserId: getBrowserId()
-            });
+            // ⚡ 프로그레스 바 애니메이션
+            const messages = [
+                { text: '감정 분석 중... 🔍', progress: 25 },
+                { text: '통계 수집 중... 📊', progress: 50 },
+                { text: '처방 준비 중... 💊', progress: 75 },
+                { text: '거의 완료! 🎉', progress: 100 }
+            ];
 
-            setTimeout(async () => {
-                const questionStats = await loadQuestionStatsFromServer();
-                
-                loadingContainer.classList.add('hidden');
-                document.getElementById('questionOptions').classList.add('hidden');
-                
-                showQuestionPrescription(question, answer, questionStats);
-            }, 800);
+            let step = 0;
+            const interval = setInterval(() => {
+                if (step < messages.length) {
+                    document.getElementById('loadingText').textContent = messages[step].text;
+                    document.getElementById('progressFill').style.width = messages[step].progress + '%';
+                    step++;
+                }
+            }, 75); // 75ms * 4 = 300ms
+
+            // ⚡ 병렬 처리
+            const [_, questionStats] = await Promise.all([
+                sendToGoogleSheets('saveQuestion', {
+                    question: question,
+                    answer: answer,
+                    browserId: getBrowserId()
+                }),
+                new Promise(resolve => setTimeout(async () => {
+                    resolve(await loadQuestionStatsFromServer());
+                }, 300))
+            ]);
+
+            clearInterval(interval);
+            
+            loadingContainer.classList.add('hidden');
+            document.getElementById('questionOptions').classList.add('hidden');
+            
+            showQuestionPrescription(question, answer, questionStats);
         }
 
-        function showQuestionPrescription(question, answer, questionStats) {
+
+      function showQuestionPrescription(question, answer, questionStats) {
             const container = document.getElementById('questionResultContainer');
             container.classList.remove('hidden');
             
@@ -1140,13 +1144,14 @@
                         <p>${analysis.message}</p>
                     </div>
 
-                    <h4>📈 전체 투표 결과</h4>
+                    <h4>📊 전체 투표 결과</h4>
             `;
 
             sortedStats.forEach(([opt, count], index) => {
                 const percent = Math.round((count / total) * 100);
                 const isYourChoice = opt === answer;
                 const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '  ';
+
                 html += `
                     <div style="background: ${isYourChoice ? '#e8f5e9' : 'white'}; padding: 8px; margin: 5px 0; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; border: 1px solid #e0e0e0;">
                         <span style="font-weight: ${isYourChoice ? 'bold' : 'normal'};">${medal} ${opt}${isYourChoice ? ' ✓' : ''}</span>
@@ -1156,7 +1161,7 @@
             });
 
             html += `
-                    <h4>🎯 추천 활동</h4>
+                    <h4>💡 추천 활동</h4>
                     <ul>
                         ${analysis.advice.map(item => `<li>${item}</li>`).join('')}
                     </ul>
@@ -1172,7 +1177,6 @@
 
         async function selectMood(mood) {
             const visitData = JSON.parse(localStorage.getItem(STORAGE_KEYS.VISIT_DATA)) || {};
-
             const buttons = document.getElementById('moodOptions').querySelectorAll('button');
             buttons.forEach(btn => btn.disabled = true);
 
@@ -1201,7 +1205,7 @@
                     <h3>${prescription.title}</h3>
                     <p>"${prescription.message}"</p>
                     
-                    <h4>🎯 오늘 추천 활동</h4>
+                    <h4>💊 오늘 추천 활동</h4>
                     <ul>
                         ${prescription.activities.map(activity => `<li>${activity}</li>`).join('')}
                     </ul>
@@ -1225,8 +1229,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // ===== 새로운 기능: 차트 및 리포트 =====
-        
         async function loadPersonalChart() {
             const browserId = getBrowserId();
             
@@ -1243,10 +1245,10 @@
                 console.error('차트 로드 실패:', error);
             }
         }
-        
+
         function displayPersonalChart(history) {
             const moodLabels = {
-                sunny: '🌞 맑음',
+                sunny: '☀️ 맑음',
                 cloudy: '⛅ 구름 조금',
                 overcast: '☁️ 흐림',
                 rainy: '🌧️ 비',
@@ -1288,7 +1290,7 @@
             html += '</div>';
             document.getElementById('personalChart').innerHTML = html;
         }
-        
+
         async function loadClassTrend() {
             try {
                 const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getClassTrend&days=7');
@@ -1301,10 +1303,10 @@
                 console.error('트렌드 로드 실패:', error);
             }
         }
-        
+
         function displayClassTrend(trend) {
             const moodLabels = {
-                sunny: '🌞 맑음',
+                sunny: '☀️ 맑음',
                 cloudy: '⛅ 구름 조금',
                 overcast: '☁️ 흐림',
                 rainy: '🌧️ 비',
@@ -1337,7 +1339,7 @@
             html += '</div>';
             document.getElementById('classTrendChart').innerHTML = html;
         }
-        
+
         async function loadWeeklyReport() {
             const browserId = getBrowserId();
             
@@ -1353,10 +1355,10 @@
                 console.error('리포트 로드 실패:', error);
             }
         }
-        
+
         function displayReport(report) {
             const moodLabels = {
-                sunny: '🌞 맑음',
+                sunny: '☀️ 맑음',
                 cloudy: '⛅ 구름 조금',
                 overcast: '☁️ 흐림',
                 rainy: '🌧️ 비',
@@ -1368,11 +1370,11 @@
             
             let html = `
                 <div class="report-card">
-                    <h4>📅 나의 이번 주 기록</h4>
+                    <h4>📊 나의 이번 주 기록</h4>
                     <div class="report-stat">${personal.totalDays}일 참여</div>
                     <div class="report-desc">
                         가장 많이 느낀 감정: <strong>${moodLabels[personal.mostFrequent]}</strong><br>
-                        ${personal.totalDays >= 5 ? '✨ 꾸준히 잘 참여하고 있어요!' : '💡 더 자주 기록해보세요!'}
+                        ${personal.totalDays >= 5 ? '✨ 꾸준히 잘 참여하고 있어요!' : '💪 더 자주 기록해보세요!'}
                     </div>
                 </div>
                 
@@ -1388,24 +1390,34 @@
             
             document.getElementById('reportContent').innerHTML = html;
         }
-        
+
         function downloadReport() {
             alert('리포트 다운로드 기능은 추후 업데이트 예정입니다!');
         }
 
+        // ⚡ 최적화: 병렬 초기화 (순차 → 동시 처리)
         async function init() {
             updateVisitData();
-            loadDailyQuestion();
-            await loadStatsFromServer();
             
-            // 새로 추가: 차트와 리포트 로드
+            // ⚡ 병렬 처리로 속도 향상
+            await Promise.all([
+                loadDailyQuestion(),
+                loadStatsFromServer()
+            ]);
+            
+            // ⚡ 차트/리포트는 1초 후 로드 (2초 → 1초 단축)
             setTimeout(() => {
                 loadPersonalChart();
                 loadWeeklyReport();
-            }, 2000);
+            }, 1000);
         }
 
         init();
     </script>
 </body>
 </html>
+
+
+      
+      
+      
