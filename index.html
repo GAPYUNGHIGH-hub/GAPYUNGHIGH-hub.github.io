@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 마음 처방전</title>
+    <script>
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzhGE9YVXjXBEF1WmXd_-PEHMoS1QgCIbxXq3HcgjuKu7-EkDzhxTB89u6i7LmFzhXOQg/exec';
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; transform: translateY(-20px); }
+            to { opacity: 1; max-height: 2000px; transform: translateY(0); }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes modalSlideIn {
+            from { transform: translateY(50px) scale(0.9); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .streak-badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        
+        .sync-badge {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-left: 5px;
+        }
+        
+        .sync-badge.offline {
+            background: #ff9800;
+        }
+        
+        .daily-question {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .daily-question h3 {
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+        
+        .daily-question .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .daily-question button {
+            background: rgba(255,255,255,0.9);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+        
+        .daily-question button:hover:not(:disabled) {
+            background: white;
+            transform: translateX(3px);
+        }
+        
+        .daily-question button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .question h3 {
+            color: #333;
+            font-size: 17px;
+            margin-bottom: 12px;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        button {
+            padding: 12px 15px;
+            font-size: 14px;
+            border: 2px solid #667eea;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            color: #333;
+        }
+        
+        button:hover:not(:disabled) {
+            background: #667eea;
+            color: white;
+            transform: translateX(3px);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .stats-section {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+        
+        .stats-section h3 {
+            color: #667eea;
+            font-size: 15px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .stat-bar {
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        
+        .bar-container {
+            background: #e0e0e0;
+            height: 22px;
+            border-radius: 11px;
+            overflow: hidden;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 11px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .total-count {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        
+        .messages-section {
+            background: #fff9e6;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+        
+        .messages-section h3 {
+            color: #f5a623;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+        
+        .message-input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .message-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #f5a623;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .message-input:focus {
+            outline: none;
+            border-color: #ff9800;
+            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1);
+        }
+        
+        .char-count {
+            text-align: right;
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .char-count.warning {
+            color: #ff9800;
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, #f5a623, #ff9800);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .send-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 166, 35, 0.3);
+        }
+        
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .messages-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
+        
+        .message-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-left: 3px solid #f5a623;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .message-text {
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .message-time {
+            font-size: 10px;
+            color: #999;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 10px;
+            color: #999;
+            font-size: 13px;
+        }
+        
+        .loading::after {
+            content: '...';
+            display: inline-block;
+            animation: dots 1.5s infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .prescription {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: #333;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 15px;
+            animation: slideDown 0.5s ease;
+        }
+        
+        .prescription h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .prescription p {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+        
+        .prescription h4 {
+            font-size: 14px;
+            margin: 15px 0 10px 0;
+            color: #2c3e50;
+        }
+        
+        .prescription ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .prescription li {
+            padding: 8px;
+            margin-bottom: 6px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        
+        .reset-btn {
+            margin-top: 15px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .chart-section {
+            background: #f0f4ff;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+        
+        .chart-section h3 {
+            color: #667eea;
+            font-size: 15px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .mood-chart-bar {
+            margin-bottom: 10px;
+        }
+        
+        .mood-chart-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        /* 모달 스타일 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        
+        .modal-header {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        .modal-header h2 {
+            font-size: 20px;
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(90deg);
+        }
+        
+        .modal-tabs {
+            display: flex;
+            background: #f8f9ff;
+            position: sticky;
+            top: 68px;
+            z-index: 9;
+        }
+        
+        .modal-tab {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .modal-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+        
+        .modal-tab:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .report-card {
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8ebff 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .report-card h4 {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .report-stat {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+        
+        .report-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .mood-distribution {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+        
+        .mood-distribution h5 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+        
+        .view-report-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .view-report-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .empty-state-text {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌈 오늘의 마음 처방전</h1>
+        <div class="subtitle">
+            감정을 솔직하게 표현하고<br>
+            건강한 마음을 가꿔보세요
+        </div>
+        
+        <div id="streakBadge" class="streak-badge">
+            🔥 <span id="streakDays">1</span>일 연속 방문
+            <span id="syncStatus" class="sync-badge">동기화됨</span>
+            <div style="font-size: 11px; margin-top: 3px; opacity: 0.9;">
+                💪 더 자주 기록해보세요!
+            </div>
+        </div>
+
+        <div id="dailyQuestionSection" class="daily-question" style="display: none;">
+            <h3>💭 오늘의 질문</h3>
+            <div id="dailyQuestionText" style="margin: 10px 0; font-size: 14px;"></div>
+            <div id="dailyQuestionOptions" class="options"></div>
+        </div>
+        
+        <div class="question">
+            <h3>🌤️ 지금 기분이 어때요?</h3>
+            <div id="moodOptions" class="options">
+                <button onclick="selectMood('sunny')">☀️ 맑음 - 기분이 아주 좋아요!</button>
+                <button onclick="selectMood('cloudy')">⛅ 구름 조금 - 괜찮은 편이에요</button>
+                <button onclick="selectMood('overcast')">☁️ 흐림 - 그저 그래요</button>
+                <button onclick="selectMood('rainy')">🌧️ 비 - 조금 우울해요</button>
+                <button onclick="selectMood('stormy')">⛈️ 폭풍 - 많이 힘들어요</button>
+            </div>
+        </div>
+        
+        <div id="prescriptionContainer" class="hidden"></div>
+        
+        <div id="statsSection" class="stats-section">
+            <h3>👥 우리 반 이번 주 감정 현황</h3>
+            <div id="statsContent">
+                <div class="loading">통계를 불러오는 중</div>
+            </div>
+        </div>
+
+        <div id="messagesSection" class="messages-section">
+            <h3>💬 익명의 한마디 (선택)</h3>
+            <div class="message-input-wrapper">
+                <textarea 
+                    id="messageInput" 
+                    class="message-input" 
+                    placeholder="오늘 기분이 어땠지 한 줄로... (최대 50자)" 
+                    maxlength="50"
+                    rows="2"
+                ></textarea>
+                <div id="charCount" class="char-count">0 / 50자</div>
+            </div>
+            <button id="sendMessageBtn" class="send-btn" onclick="sendMessage()">💬 등록</button>
+            
+            <div style="margin: 10px 0; padding: 8px; background: rgba(245, 166, 35, 0.1); border-radius: 8px; font-size: 11px; color: #666;">
+                🔒 엔터 키를 눌러도 등록됩니다
+            </div>
+            
+            <div id="messagesList" class="messages-list"></div>
+        </div>
+
+        <!-- 리포트 버튼 위치 변경: 익명의 한마디 아래로 -->
+        <button class="view-report-btn" onclick="openReportModal()">
+            📊 나의 감정 리포트 보기
+        </button>
+
+        <div id="chartSection" class="chart-section" style="display: none;">
+            <h3>📈 나의 감정 기록</h3>
+            <div id="personalChart"></div>
+        </div>
+
+        <div id="classTrendSection" class="chart-section" style="display: none;">
+            <h3>📊 우리 반 이번 주</h3>
+            <div id="classTrendChart"></div>
+        </div>
+    </div>
+
+    <!-- 리포트 모달 -->
+    <div id="reportModal" class="modal-overlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2>📊 감정 리포트</h2>
+                <button class="modal-close" onclick="closeReportModal()">×</button>
+            </div>
+            
+            <div class="modal-tabs">
+                <button class="modal-tab active" onclick="switchTab('daily')">일간</button>
+                <button class="modal-tab" onclick="switchTab('weekly')">주간</button>
+                <button class="modal-tab" onclick="switchTab('monthly')">월간</button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- 일간 리포트 -->
+                <div id="dailyReport" class="tab-content active">
+                    <div id="dailyReportContent">
+                        <div class="loading">일간 리포트를 불러오는 중</div>
+                    </div>
+                </div>
+                
+                <!-- 주간 리포트 -->
+                <div id="weeklyReport" class="tab-content">
+                    <div id="weeklyReportContent">
+                        <div class="loading">주간 리포트를 불러오는 중</div>
+                    </div>
+                </div>
+                
+                <!-- 월간 리포트 -->
+                <div id="monthlyReport" class="tab-content">
+                    <div id="monthlyReportContent">
+                        <div class="loading">월간 리포트를 불러오는 중</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEYS = {
+            BROWSER_ID: 'browserUniqueId',
+            VISIT_DATA: 'visitData',
+            LAST_VISIT: 'lastVisitDate',
+            MOOD_CACHE: 'moodStatsCache',
+            MESSAGES_CACHE: 'messagesCache',
+            DAILY_ANSWER: 'dailyAnswer'
+        };
+
+        const prescriptions = {
+            sunny: {
+                title: "🌟 오늘 기분이 최고네요!",
+                message: "이 긍정적인 에너지를 간직하세요. 당신의 밝은 에너지가 주변을 밝게 합니다.",
+                activities: [
+                    "🎵 좋아하는 음악 들으며 산책하기",
+                    "📝 오늘의 행복한 순간 일기 쓰기",
+                    "💌 고마운 사람에게 메시지 보내기"
+                ]
+            },
+            cloudy: {
+                title: "😊 괜찮은 하루네요",
+                message: "평온함도 소중한 감정이에요. 작은 기쁨을 찾아보세요.",
+                activities: [
+                    "🎨 가벼운 취미 활동하기",
+                    "🌿 집 근처 공원 산책하기",
+                    "☕ 따뜻한 음료 한 잔 즐기기"
+                ]
+            },
+            overcast: {
+                title: "😐 그저 그런 날이에요",
+                message: "모든 날이 완벽할 순 없어요. 자신에게 너그러워지세요.",
+                activities: [
+                    "🛀 따뜻한 물로 샤워하기",
+                    "📚 가벼운 책이나 만화 읽기",
+                    "🎬 재미있는 영상 보며 휴식하기"
+                ]
+            },
+            rainy: {
+                title: "🌧️ 조금 힘든 하루네요",
+                message: "힘든 감정도 당신의 일부예요. 천천히, 한 발짝씩 나아가요.",
+                activities: [
+                    "🎧 차분한 음악 들으며 쉬기",
+                    "💭 감정 일기 쓰며 마음 정리하기",
+                    "🗣️ 믿을 수 있는 사람과 대화하기"
+                ]
+            },
+            stormy: {
+                title: "⛈️ 많이 힘들어 보여요",
+                message: "혼자 견디지 마세요. 도움을 요청하는 것은 용기있는 행동입니다.",
+                activities: [
+                    "🆘 전문가나 상담사와 대화하기",
+                    "😴 충분한 휴식과 수면 취하기",
+                    "🤗 가까운 사람에게 솔직하게 털어놓기",
+                    "📞 청소년 상담전화 1388 (24시간)"
+                ]
+            }
+        };
+
+        function getBrowserId() {
+            let browserId = localStorage.getItem(STORAGE_KEYS.BROWSER_ID);
+            if (!browserId) {
+                browserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem(STORAGE_KEYS.BROWSER_ID, browserId);
+            }
+            return browserId;
+        }
+
+        function updateVisitData() {
+            const today = new Date().toDateString();
+            const lastVisit = localStorage.getItem(STORAGE_KEYS.LAST_VISIT);
+            const visitData = JSON.parse(localStorage.getItem(STORAGE_KEYS.VISIT_DATA)) || {
+                streak: 0,
+                totalVisits: 0
+            };
+
+            if (lastVisit === today) {
+                return;
+            }
+
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            if (lastVisit === yesterday.toDateString()) {
+                visitData.streak += 1;
+            } else if (lastVisit !== today) {
+                visitData.streak = 1;
+            }
+
+            visitData.totalVisits += 1;
+            visitData.lastVisit = today;
+
+            localStorage.setItem(STORAGE_KEYS.LAST_VISIT, today);
+            localStorage.setItem(STORAGE_KEYS.VISIT_DATA, JSON.stringify(visitData));
+
+            document.getElementById('streakDays').textContent = visitData.streak;
+        }
+
+        async function sendToGoogleSheets(action, data) {
+            const syncStatus = document.getElementById('syncStatus');
+            
+            try {
+                syncStatus.textContent = '동기화 중...';
+                syncStatus.classList.add('offline');
+
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: action,
+                        ...data
+                    })
+                });
+
+                syncStatus.textContent = '동기화됨';
+                syncStatus.classList.remove('offline');
+                
+                return { success: true };
+            } catch (error) {
+                console.error('동기화 실패:', error);
+                syncStatus.textContent = '오프라인';
+                syncStatus.classList.add('offline');
+                return { success: false, error };
+            }
+        }
+
+        async function loadDailyQuestion() {
+            try {
+                const today = new Date().toDateString();
+                const savedAnswer = localStorage.getItem(STORAGE_KEYS.DAILY_ANSWER);
+                const savedData = savedAnswer ? JSON.parse(savedAnswer) : null;
+
+                if (savedData && savedData.date === today) {
+                    return;
+                }
+
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getDailyQuestion');
+                const data = await response.json();
+
+                if (data.success && data.question) {
+                    displayDailyQuestion(data.question);
+                }
+            } catch (error) {
+                console.error('질문 로드 실패:', error);
+            }
+        }
+
+        function displayDailyQuestion(question) {
+            const section = document.getElementById('dailyQuestionSection');
+            const textEl = document.getElementById('dailyQuestionText');
+            const optionsEl = document.getElementById('dailyQuestionOptions');
+
+            textEl.textContent = question.question;
+            
+            let optionsHtml = '';
+            question.options.forEach((option, index) => {
+                optionsHtml += `
+                    <button onclick="answerDailyQuestion(${index}, '${option.replace(/'/g, "\\'")}')">
+                        ${option}
+                    </button>
+                `;
+            });
+            
+            optionsEl.innerHTML = optionsHtml;
+            section.style.display = 'block';
+        }
+
+        async function answerDailyQuestion(optionIndex, optionText) {
+            const today = new Date().toDateString();
+            const buttons = document.getElementById('dailyQuestionOptions').querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            await sendToGoogleSheets('saveDailyAnswer', {
+                answer: optionText,
+                optionIndex: optionIndex,
+                browserId: getBrowserId()
+            });
+
+            localStorage.setItem(STORAGE_KEYS.DAILY_ANSWER, JSON.stringify({
+                date: today,
+                answer: optionText
+            }));
+
+            document.getElementById('dailyQuestionSection').style.display = 'none';
+        }
+
+        async function loadStatsFromServer() {
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getStats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem(STORAGE_KEYS.MOOD_CACHE, JSON.stringify({
+                        data: data.stats,
+                        timestamp: Date.now()
+                    }));
+                    displayStats(data.stats);
+                } else {
+                    loadStatsFromCache();
+                }
+            } catch (error) {
+                console.error('통계 로드 실패:', error);
+                loadStatsFromCache();
+            }
+        }
+
+        function loadStatsFromCache() {
+            const cached = localStorage.getItem(STORAGE_KEYS.MOOD_CACHE);
+            if (cached) {
+                const { data } = JSON.parse(cached);
+                displayStats(data);
+            }
+        }
+
+        function displayStats(stats) {
+            const moodLabels = {
+                sunny: '☀️ 맑음',
+                cloudy: '⛅ 구름 조금',
+                overcast: '☁️ 흐림',
+                rainy: '🌧️ 비',
+                stormy: '⛈️ 폭풍'
+            };
+
+            const total = stats.sunny + stats.cloudy + stats.overcast + stats.rainy + stats.stormy;
+            
+            let html = '';
+            ['sunny', 'cloudy', 'overcast', 'rainy', 'stormy'].forEach(mood => {
+                const count = stats[mood];
+                const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+                
+                html += `
+                    <div class="stat-bar">
+                        <div class="stat-label">
+                            <span>${moodLabels[mood]}</span>
+                            <span>${count}명 (${percentage}%)</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: ${percentage}%">
+                                ${percentage > 10 ? percentage + '%' : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `<div class="total-count">총 ${total}명 참여</div>`;
+            
+            document.getElementById('statsContent').innerHTML = html;
+        }
+
+        async function loadMessages() {
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getMessages&limit=10');
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem(STORAGE_KEYS.MESSAGES_CACHE, JSON.stringify({
+                        data: data.messages,
+                        timestamp: Date.now()
+                    }));
+                    displayMessages(data.messages);
+                } else {
+                    loadMessagesFromCache();
+                }
+            } catch (error) {
+                console.error('메시지 로드 실패:', error);
+                loadMessagesFromCache();
+            }
+        }
+
+        function loadMessagesFromCache() {
+            const cached = localStorage.getItem(STORAGE_KEYS.MESSAGES_CACHE);
+            if (cached) {
+                const { data } = JSON.parse(cached);
+                displayMessages(data);
+            }
+        }
+
+        function displayMessages(messages) {
+            const container = document.getElementById('messagesList');
+            
+            if (messages.length === 0) {
+                container.innerHTML = '<div class="loading">아직 메시지가 없어요. 첫 번째 메시지를 남겨보세요!</div>';
+                return;
+            }
+            
+            let html = '<div style="margin-bottom: 8px; font-size: 12px; color: #999;">최근 친구들의 한마디</div>';
+            
+            messages.forEach(msg => {
+                const date = new Date(msg.timestamp);
+                const timeStr = date.toLocaleString('ko-KR', { 
+                    month: 'short', 
+                    day: 'numeric', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                html += `
+                    <div class="message-item">
+                        <div class="message-text">"${msg.message}"</div>
+                        <div class="message-time">${timeStr}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        document.getElementById('messageInput').addEventListener('input', function(e) {
+            const length = e.target.value.length;
+            const counter = document.getElementById('charCount');
+            counter.textContent = `${length} / 50자`;
+            
+            if (length >= 45) {
+                counter.classList.add('warning');
+            } else {
+                counter.classList.remove('warning');
+            }
+        });
+
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (message.length === 0) {
+                alert('메시지를 입력해주세요!');
+                return;
+            }
+            
+            if (message.length > 50) {
+                alert('50자 이내로 작성해주세요!');
+                return;
+            }
+
+            const btn = document.getElementById('sendMessageBtn');
+            btn.disabled = true;
+            btn.textContent = '전송 중...';
+
+            await sendToGoogleSheets('saveMessage', {
+                message: message,
+                browserId: getBrowserId()
+            });
+
+            input.value = '';
+            document.getElementById('charCount').textContent = '0 / 50자';
+            
+            btn.disabled = false;
+            btn.textContent = '💬 등록';
+
+            setTimeout(() => {
+                loadMessages();
+            }, 1000);
+        }
+
+        async function selectMood(mood) {
+            const visitData = JSON.parse(localStorage.getItem(STORAGE_KEYS.VISIT_DATA)) || {};
+            const buttons = document.getElementById('moodOptions').querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            await sendToGoogleSheets('saveMood', {
+                mood: mood,
+                message: '',
+                streak: visitData.streak || 1,
+                totalVisits: visitData.totalVisits || 1,
+                browserId: getBrowserId()
+            });
+
+            showPrescription(mood);
+
+            setTimeout(() => {
+                loadStatsFromServer();
+                buttons.forEach(btn => btn.disabled = false);
+            }, 1000);
+        }
+
+        function showPrescription(mood) {
+            const prescription = prescriptions[mood];
+            const container = document.getElementById('prescriptionContainer');
+            
+            let html = `
+                <div class="prescription">
+                    <h3>${prescription.title}</h3>
+                    <p>"${prescription.message}"</p>
+                    
+                    <h4>💊 오늘 추천 활동</h4>
+                    <ul>
+                        ${prescription.activities.map(activity => `<li>${activity}</li>`).join('')}
+                    </ul>
+
+                    <button class="reset-btn" onclick="resetPrescription()">🔄 다시 체크하기</button>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            container.classList.remove('hidden');
+            
+            setTimeout(() => {
+                container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        function resetPrescription() {
+            document.getElementById('prescriptionContainer').classList.add('hidden');
+            document.getElementById('prescriptionContainer').innerHTML = '';
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function loadPersonalChart() {
+            const browserId = getBrowserId();
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getPersonalHistory&browserId=' + browserId);
+                const data = await response.json();
+                
+                if (data.success && data.history && data.history.length >= 3) {
+                    document.getElementById('chartSection').style.display = 'block';
+                    displayPersonalChart(data.history);
+                    loadClassTrend();
+                }
+            } catch (error) {
+                console.error('차트 로드 실패:', error);
+            }
+        }
+
+        function displayPersonalChart(history) {
+            const moodLabels = {
+                sunny: '☀️ 맑음',
+                cloudy: '⛅ 구름 조금',
+                overcast: '☁️ 흐림',
+                rainy: '🌧️ 비',
+                stormy: '⛈️ 폭풍'
+            };
+            
+            const moodColors = {
+                sunny: '#FFD700',
+                cloudy: '#87CEEB',
+                overcast: '#B0C4DE',
+                rainy: '#4682B4',
+                stormy: '#2F4F4F'
+            };
+            
+            let html = '<div style="max-height: 200px; overflow-y: auto;">';
+            
+            history.forEach(record => {
+                const mood = record.mood;
+                const date = new Date(record.date).toLocaleDateString('ko-KR', { 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                
+                html += `
+                    <div class="mood-chart-bar">
+                        <div class="mood-chart-label">
+                            <span>${date}</span>
+                            <span>${moodLabels[mood]}</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 100%; background: ${moodColors[mood]};">
+                                ${moodLabels[mood]}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            document.getElementById('personalChart').innerHTML = html;
+        }
+
+        async function loadClassTrend() {
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getClassTrend&days=7');
+                const data = await response.json();
+                
+                if (data.success && data.trend) {
+                    displayClassTrend(data.trend);
+                }
+            } catch (error) {
+                console.error('트렌드 로드 실패:', error);
+            }
+        }
+
+        function displayClassTrend(trend) {
+            const moodLabels = {
+                sunny: '☀️ 맑음',
+                cloudy: '⛅ 구름 조금',
+                overcast: '☁️ 흐림',
+                rainy: '🌧️ 비',
+                stormy: '⛈️ 폭풍'
+            };
+            
+            let html = '<div style="background: white; padding: 15px; border-radius: 10px;">';
+            
+            trend.forEach(day => {
+                const date = new Date(day.date).toLocaleDateString('ko-KR', { 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                
+                const total = day.total;
+                const moods = ['sunny', 'cloudy', 'overcast', 'rainy', 'stormy'];
+                const maxMood = moods.reduce((max, mood) => 
+                    day[mood] > day[max] ? mood : max, 'sunny'
+                );
+                
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0;">
+                        <span style="font-size: 13px; color: #666;">${date}</span>
+                        <span style="font-size: 16px;">${moodLabels[maxMood]}</span>
+                        <span style="font-size: 12px; color: #999;">${total}명</span>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            document.getElementById('classTrendChart').innerHTML = html;
+        }
+
+        // ===== 모달 리포트 기능 =====
+        
+        function openReportModal() {
+            const modal = document.getElementById('reportModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
+            
+            // 현재 활성화된 탭의 데이터 로드
+            const activeTab = document.querySelector('.modal-tab.active').textContent;
+            if (activeTab === '일간') {
+                loadDailyReport();
+            } else if (activeTab === '주간') {
+                loadWeeklyReport();
+            } else {
+                loadMonthlyReport();
+            }
+        }
+
+        function closeReportModal() {
+            const modal = document.getElementById('reportModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // 배경 스크롤 복원
+        }
+
+        function closeModalOnOverlay(event) {
+            if (event.target.id === 'reportModal') {
+                closeReportModal();
+            }
+        }
+
+        function switchTab(tabName) {
+            // 탭 버튼 활성화 상태 변경
+            document.querySelectorAll('.modal-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 콘텐츠 표시 변경
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            if (tabName === 'daily') {
+                document.getElementById('dailyReport').classList.add('active');
+                loadDailyReport();
+            } else if (tabName === 'weekly') {
+                document.getElementById('weeklyReport').classList.add('active');
+                loadWeeklyReport();
+            } else if (tabName === 'monthly') {
+                document.getElementById('monthlyReport').classList.add('active');
+                loadMonthlyReport();
+            }
+        }
+
+        async function loadDailyReport() {
+            const browserId = getBrowserId();
+            const container = document.getElementById('dailyReportContent');
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getDailyReport&browserId=' + browserId);
+                const data = await response.json();
+                
+                if (data.success && data.report) {
+                    displayDailyReport(data.report);
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📅</div>
+                            <div class="empty-state-text">
+                                오늘의 감정 기록이 아직 없어요.<br>
+                                기분을 선택하고 리포트를 만들어보세요!
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('일간 리포트 로드 실패:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <div class="empty-state-text">
+                            리포트를 불러오는데 실패했어요.<br>
+                            잠시 후 다시 시도해주세요.
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function displayDailyReport(report) {
+            const moodLabels = {
+                sunny: '☀️ 맑음',
+                cloudy: '⛅ 구름 조금',
+                overcast: '☁️ 흐림',
+                rainy: '🌧️ 비',
+                stormy: '⛈️ 폭풍'
+            };
+
+            const container = document.getElementById('dailyReportContent');
+            const today = new Date().toLocaleDateString('ko-KR', { 
+                year: 'numeric',
+                month: 'long', 
+                day: 'numeric' 
+            });
+
+            let html = `
+                <div class="report-card">
+                    <h4>📅 ${today}</h4>
+                    ${report.myMood ? `
+                        <div class="report-stat">${moodLabels[report.myMood]}</div>
+                        <div class="report-desc">
+                            오늘 나의 기분이에요.<br>
+                            ${getMoodAdvice(report.myMood)}
+                        </div>
+                    ` : `
+                        <div class="report-desc">
+                            오늘 아직 기분을 기록하지 않았어요.
+                        </div>
+                    `}
+                </div>
+
+                <div class="report-card">
+                    <h4>👥 우리 반 오늘의 분위기</h4>
+                    <div class="report-stat">${report.classTotal}명 참여</div>
+                    <div class="report-desc">
+                        반 전체 주된 감정: <strong>${moodLabels[report.classMostFrequent]}</strong><br>
+                        ${getClassMoodComment(report.classMostFrequent)}
+                    </div>
+                </div>
+
+                <div class="mood-distribution">
+                    <h5>📊 오늘의 감정 분포</h5>
+                    ${generateMoodBars(report.classDistribution)}
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        async function loadWeeklyReport() {
+            const browserId = getBrowserId();
+            const container = document.getElementById('weeklyReportContent');
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getWeeklyReport&browserId=' + browserId);
+                const data = await response.json();
+                
+                if (data.success && data.report && data.report.personal.totalDays >= 1) {
+                    displayWeeklyReport(data.report);
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📊</div>
+                            <div class="empty-state-text">
+                                이번 주 기록이 아직 부족해요.<br>
+                                3일 이상 기록하면 상세한 리포트를 볼 수 있어요!
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('주간 리포트 로드 실패:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <div class="empty-state-text">
+                            리포트를 불러오는데 실패했어요.<br>
+                            잠시 후 다시 시도해주세요.
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function displayWeeklyReport(report) {
+            const moodLabels = {
+                sunny: '☀️ 맑음',
+                cloudy: '⛅ 구름 조금',
+                overcast: '☁️ 흐림',
+                rainy: '🌧️ 비',
+                stormy: '⛈️ 폭풍'
+            };
+            
+            const personal = report.personal;
+            const classData = report.class;
+            const container = document.getElementById('weeklyReportContent');
+
+            let html = `
+                <div class="report-card">
+                    <h4>📊 나의 이번 주 기록</h4>
+                    <div class="report-stat">${personal.totalDays}일 참여</div>
+                    <div class="report-desc">
+                        가장 많이 느낀 감정: <strong>${moodLabels[personal.mostFrequent]}</strong><br>
+                        ${personal.totalDays >= 5 ? '✨ 꾸준히 잘 참여하고 있어요!' : '💪 더 자주 기록해보세요!'}
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <h4>👥 우리 반 이번 주</h4>
+                    <div class="report-stat">${classData.uniqueParticipants}명 참여</div>
+                    <div class="report-desc">
+                        총 ${classData.totalRecords}회 기록<br>
+                        우리 반의 주된 감정: <strong>${moodLabels[classData.mostFrequent]}</strong>
+                    </div>
+                </div>
+
+                ${personal.distribution ? `
+                    <div class="mood-distribution">
+                        <h5>📊 나의 감정 분포</h5>
+                        ${generateMoodBars(personal.distribution)}
+                    </div>
+                ` : ''}
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        async function loadMonthlyReport() {
+            const browserId = getBrowserId();
+            const container = document.getElementById('monthlyReportContent');
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getMonthlyReport&browserId=' + browserId);
+                const data = await response.json();
+                
+                if (data.success && data.report && data.report.personal.totalDays >= 3) {
+                    displayMonthlyReport(data.report);
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📈</div>
+                            <div class="empty-state-text">
+                                이번 달 기록이 아직 부족해요.<br>
+                                일주일 이상 기록하면 월간 리포트를 볼 수 있어요!
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('월간 리포트 로드 실패:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <div class="empty-state-text">
+                            리포트를 불러오는데 실패했어요.<br>
+                            잠시 후 다시 시도해주세요.
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function displayMonthlyReport(report) {
+            const moodLabels = {
+                sunny: '☀️ 맑음',
+                cloudy: '⛅ 구름 조금',
+                overcast: '☁️ 흐림',
+                rainy: '🌧️ 비',
+                stormy: '⛈️ 폭풍'
+            };
+            
+            const personal = report.personal;
+            const classData = report.class;
+            const container = document.getElementById('monthlyReportContent');
+            const currentMonth = new Date().toLocaleDateString('ko-KR', { 
+                year: 'numeric',
+                month: 'long'
+            });
+
+            let html = `
+                <div class="report-card">
+                    <h4>📈 ${currentMonth} 나의 기록</h4>
+                    <div class="report-stat">${personal.totalDays}일 참여</div>
+                    <div class="report-desc">
+                        가장 많이 느낀 감정: <strong>${moodLabels[personal.mostFrequent]}</strong><br>
+                        ${getMonthlyComment(personal.totalDays)}
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <h4>👥 우리 반 이번 달</h4>
+                    <div class="report-stat">${classData.uniqueParticipants}명 참여</div>
+                    <div class="report-desc">
+                        총 ${classData.totalRecords}회 기록<br>
+                        반 전체 주된 감정: <strong>${moodLabels[classData.mostFrequent]}</strong>
+                    </div>
+                </div>
+
+                ${personal.distribution ? `
+                    <div class="mood-distribution">
+                        <h5>📊 나의 감정 변화</h5>
+                        ${generateMoodBars(personal.distribution)}
+                        <div style="margin-top: 15px; padding: 12px; background: #f8f9ff; border-radius: 8px; font-size: 13px; color: #666;">
+                            💡 ${getMonthlyInsight(personal)}
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function generateMoodBars(distribution) {
+            const moodLabels = {
+                sunny: '☀️ 맑음',
+                cloudy: '⛅ 구름 조금',
+                overcast: '☁️ 흐림',
+                rainy: '🌧️ 비',
+                stormy: '⛈️ 폭풍'
+            };
+
+            const total = Object.values(distribution).reduce((sum, val) => sum + val, 0);
+            let html = '';
+
+            ['sunny', 'cloudy', 'overcast', 'rainy', 'stormy'].forEach(mood => {
+                const count = distribution[mood] || 0;
+                const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+                
+                html += `
+                    <div class="stat-bar">
+                        <div class="stat-label">
+                            <span>${moodLabels[mood]}</span>
+                            <span>${count}회 (${percentage}%)</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: ${percentage}%">
+                                ${percentage > 10 ? percentage + '%' : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            return html;
+        }
+
+        function getMoodAdvice(mood) {
+            const advice = {
+                sunny: '긍정적인 에너지를 유지하세요! 🌟',
+                cloudy: '평온한 하루를 즐기고 있네요 😊',
+                overcast: '작은 기쁨을 찾아보는 건 어떨까요? 🌱',
+                rainy: '힘든 감정도 소중해요. 천천히 가요 💙',
+                stormy: '혼자 견디지 말고 도움을 요청하세요 🤗'
+            };
+            return advice[mood] || '';
+        }
+
+        function getClassMoodComment(mood) {
+            const comments = {
+                sunny: '오늘 우리 반 분위기가 참 밝네요! ✨',
+                cloudy: '평온한 하루를 보내고 있어요 😌',
+                overcast: '조금 차분한 분위기예요 🤔',
+                rainy: '힘든 친구들이 많은 것 같아요 💙',
+                stormy: '많은 친구들이 어려움을 겪고 있어요 😢'
+            };
+            return comments[mood] || '';
+        }
+
+        function getMonthlyComment(days) {
+            if (days >= 20) return '🏆 한 달 동안 꾸준히 기록했어요! 정말 대단해요!';
+            if (days >= 15) return '👏 이번 달도 열심히 참여하고 있어요!';
+            if (days >= 10) return '💪 좋아요! 계속 이어가봐요!';
+            if (days >= 5) return '🌱 좋은 시작이에요. 더 자주 기록해보세요!';
+            return '📝 더 자주 감정을 기록하면 더 많은 인사이트를 얻을 수 있어요!';
+        }
+
+        function getMonthlyInsight(personal) {
+            const positiveCount = (personal.distribution.sunny || 0) + (personal.distribution.cloudy || 0);
+            const negativeCount = (personal.distribution.rainy || 0) + (personal.distribution.stormy || 0);
+            
+            if (positiveCount > negativeCount * 2) {
+                return '이번 달은 긍정적인 감정이 많았어요! 이 에너지를 계속 유지해보세요 ✨';
+            } else if (negativeCount > positiveCount) {
+                return '힘든 순간이 많았던 것 같아요. 주변 사람들과 대화를 나눠보는 건 어떨까요? 💙';
+            } else {
+                return '균형잡힌 감정 상태를 유지하고 있어요. 자신을 잘 돌보고 있네요! 😊';
+            }
+        }
+
+        // ⚡ 최적화: 병렬 초기화 (순차 → 동시 처리)
+        async function init() {
+            updateVisitData();
+            
+            // ⚡ 병렬 처리로 속도 향상
+            await Promise.all([
+                loadDailyQuestion(),
+                loadStatsFromServer(),
+                loadMessages()
+            ]);
+            
+            // ⚡ 차트는 1초 후 로드
+            setTimeout(() => {
+                loadPersonalChart();
+            }, 1000);
+        }
+
+        // ESC 키로 모달 닫기
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeReportModal();
+            }
+        });
+
+        init();
+    </script>
+</body>
+</html>
