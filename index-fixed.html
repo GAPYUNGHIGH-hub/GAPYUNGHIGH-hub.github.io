@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 마음 처방전</title>
+    <script>
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzhGE9YVXjXBEF1WmXd_-PEHMoS1QgCIbxXq3HcgjuKu7-EkDzhxTB89u6i7LmFzhXOQg/exec';
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; transform: translateY(-20px); }
+            to { opacity: 1; max-height: 2000px; transform: translateY(0); }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .streak-badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        
+        .sync-badge {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-left: 5px;
+        }
+        
+        .sync-badge.offline {
+            background: #ff9800;
+        }
+        
+        .daily-question {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .daily-question h3 {
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+        
+        .daily-question .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .daily-question button {
+            background: rgba(255,255,255,0.9);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+        
+        .daily-question button:hover:not(:disabled) {
+            background: white;
+            transform: translateX(3px);
+        }
+        
+        .daily-question button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .question h3 {
+            color: #333;
+            font-size: 17px;
+            margin-bottom: 12px;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        button {
+            padding: 12px 15px;
+            font-size: 14px;
+            border: 2px solid #667eea;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            color: #333;
+        }
+        
+        button:hover:not(:disabled) {
+            background: #667eea;
+            color: white;
+            transform: translateX(3px);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .stats-section {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+        
+        .stats-section h3 {
+            color: #667eea;
+            font-size: 15px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .stat-bar {
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        
+        .bar-container {
+            background: #e0e0e0;
+            height: 22px;
+            border-radius: 11px;
+            overflow: hidden;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 11px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .total-count {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        
+        .messages-section {
+            background: #fff9e6;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+        
+        .messages-section h3 {
+            color: #f5a623;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+        
+        .message-input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .message-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #f5a623;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .message-input:focus {
+            outline: none;
+            border-color: #ff9800;
+            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1);
+        }
+        
+        .submit-message-btn {
+            width: 100%;
+            padding: 12px;
+            background: #f5a623;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .submit-message-btn:hover {
+            background: #ff9800;
+            transform: scale(1.02);
+        }
+        
+        .success-message {
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .input-hint {
+            font-size: 11px;
+            color: #999;
+            margin-top: 3px;
+        }
+        
+        .message-list {
+            max-height: 180px;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
+        
+        .message-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            font-size: 12px;
+            color: #555;
+            border-left: 3px solid #f5a623;
+            animation: fadeIn 0.3s ease;
+            word-break: break-word;
+        }
+        
+        .message-time {
+            font-size: 10px;
+            color: #999;
+            margin-top: 3px;
+        }
+        
+        .message-item.new {
+            background: #fffbf0;
+            border-left: 3px solid #ff9800;
+        }
+        
+        .prescription {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            animation: slideDown 0.5s ease;
+            overflow: hidden;
+        }
+        
+        .prescription h3 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 17px;
+        }
+        
+        .prescription p {
+            line-height: 1.6;
+            color: #444;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        
+        .prescription h4 {
+            color: #764ba2;
+            margin: 12px 0 8px 0;
+            font-size: 14px;
+        }
+        
+        .prescription ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .prescription li {
+            padding: 6px 0;
+            padding-left: 18px;
+            position: relative;
+            line-height: 1.5;
+            font-size: 13px;
+        }
+        
+        .prescription li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .question-prescription {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 12px 0 0 0;
+            border: 2px solid #ff9800;
+            animation: slideDown 0.5s ease;
+            overflow: hidden;
+        }
+        
+        .question-prescription h3 {
+            color: #f57c00;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        .winner-badge {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb300 100%);
+            color: #663c00;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
+        }
+        
+        .analysis-box {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            border-left: 4px solid #ff9800;
+        }
+        
+        .analysis-box p {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 6px 0;
+        }
+        
+        .question-prescription h4 {
+            color: #f57c00;
+            margin: 12px 0 8px 0;
+            font-size: 14px;
+        }
+        
+        .question-prescription ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .question-prescription li {
+            padding: 6px 0;
+            padding-left: 18px;
+            position: relative;
+            line-height: 1.5;
+            font-size: 12px;
+            color: #555;
+        }
+        
+        .question-prescription li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #ff9800;
+            font-weight: bold;
+        }
+        
+        .loading-indicator {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 12px;
+            text-align: center;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 8px auto;
+        }
+        
+        .loading-indicator p {
+            color: #667eea;
+            font-size: 12px;
+            margin: 8px 0 4px 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            transition: width 0.2s ease;
+            width: 0%;
+        }
+        
+        .reset-btn {
+            width: 100%;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+        
+        .reset-btn:hover {
+            background: #764ba2;
+            transform: scale(1.02);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 11px;
+            color: #999;
+            line-height: 1.5;
+        }
+        
+        .creator-info {
+            text-align: center;
+            color: #999;
+            font-size: 10px;
+            margin-top: 20px;
+            padding: 15px 0;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .creator-info .title {
+            font-size: 11px;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+        
+        .creator-info .details {
+            font-size: 9px;
+            color: #bbb;
+        }
+        
+        .chart-section, .report-section {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+        
+        .chart-section h3, .report-section h3 {
+            color: #667eea;
+            font-size: 15px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .mood-chart-bar {
+            margin: 10px 0;
+        }
+        
+        .mood-chart-label {
+            font-size: 13px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .report-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+        
+        .report-card h4 {
+            font-size: 14px;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        
+        .report-stat {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 8px 0;
+        }
+        
+        .report-desc {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        @media (min-width: 480px) {
+            body { padding: 20px; }
+            .container { padding: 30px; border-radius: 25px; }
+            h1 { font-size: 26px; }
+            .subtitle { font-size: 14px; }
+            .message-input-wrapper { flex-direction: row; gap: 8px; }
+            .message-input { flex: 1; }
+            .submit-message-btn { width: auto; padding: 12px 20px; white-space: nowrap; }
+            .submit-message-btn:hover { transform: translateX(0) scale(1.05); }
+        }
+    </style>
+</head>
+
+  <body>
+    <div class="container">
+        <div class="streak-badge">
+            🔥 연속 방문: <span id="streakDays">1</span>일 | 총 방문: <span id="totalVisits">1</span>회
+            <span class="sync-badge" id="syncBadge">☁️동기화</span>
+        </div>
+
+        <div class="daily-question">
+            <h3>📋 오늘의 질문</h3>
+            <p id="questionText" style="margin-bottom: 8px; font-size: 13px;"></p>
+            <div class="options" id="questionOptions"></div>
+            <div id="questionLoadingContainer" class="hidden"></div>
+            <div id="questionResultContainer" class="hidden"></div>
+        </div>
+
+        <h1>💊 오늘의 마음 처방전</h1>
+        <p class="subtitle">
+            지금 이 순간의 마음을 체크하고<br>
+            맞춤 처방을 받아보세요
+        </p>
+
+        <div class="question">
+            <h3>지금 이 순간, 당신의 마음은?</h3>
+            <div class="options" id="moodOptions">
+                <button onclick="selectMood('sunny')">☀️ 맑음 - 기분 좋고 에너지가 충만</button>
+                <button onclick="selectMood('cloudy')">⛅ 구름 조금 - 괜찮은데 약간 피곤함</button>
+                <button onclick="selectMood('overcast')">☁️ 흐림 - 답답하고 무기력함</button>
+                <button onclick="selectMood('rainy')">🌧️ 비 - 힘들고 우울함</button>
+                <button onclick="selectMood('stormy')">⛈️ 폭풍 - 감당하기 어려움</button>
+            </div>
+        </div>
+
+        <div id="prescriptionContainer" class="hidden"></div>
+
+        <div class="stats-section">
+            <h3>📊 실시간 우리 반 마음 날씨</h3>
+            <div id="statsContainer">
+                <div class="loading">통계 불러오는 중...</div>
+            </div>
+            <p class="total-count">총 <span id="totalParticipants">0</span>명 참여 중</p>
+        </div>
+
+        <div class="chart-section" id="chartSection" style="display: none;">
+            <h3>📈 나의 마음 변화</h3>
+            <p style="text-align: center; font-size: 12px; color: #999; margin-bottom: 15px;">
+                최근 7일간의 기분 변화를 확인하세요
+            </p>
+            <div id="personalChart" style="margin: 20px 0;">
+                <p style="text-align: center; color: #999; font-size: 13px;">
+                    데이터를 불러오는 중...
+                </p>
+            </div>
+            <div id="classTrendChart" style="margin: 20px 0;">
+                <h4 style="font-size: 14px; margin: 15px 0; color: #667eea; text-align: center;">
+                    📊 우리 반 마음 트렌드
+                </h4>
+            </div>
+        </div>
+
+        <div class="report-section" id="reportSection" style="display: none;">
+            <h3>📋 나의 주간 리포트</h3>
+            <div id="reportContent" style="margin: 15px 0;">
+                <p style="text-align: center; color: #999; font-size: 13px;">
+                    데이터를 불러오는 중...
+                </p>
+            </div>
+            <button class="reset-btn" onclick="downloadReport()">
+                📥 리포트 다운로드 (PDF)
+            </button>
+        </div>
+
+        <div class="messages-section">
+            <h3>💬 익명의 한마디 (선택)</h3>
+            
+            <div id="successMessage" class="success-message hidden">
+                ✓ 메시지가 등록되었습니다!
+            </div>
+
+            <div class="message-input-wrapper">
+                <input type="text" 
+                       class="message-input" 
+                       id="anonymousMessage" 
+                       placeholder="오늘 기분이 어떤지 한 줄로... (최대 50자)"
+                       maxlength="50"
+                       onkeypress="handleMessageKeyPress(event)">
+                <button class="submit-message-btn" onclick="submitMessage()">
+                    💬 등록
+                </button>
+            </div>
+            <p class="input-hint">↩️ 엔터 키를 눌러도 등록됩니다</p>
+            
+            <h4 style="font-size: 13px; color: #666; margin-top: 15px;">최근 친구들의 한마디</h4>
+            <div class="message-list" id="messageList">
+                <div class="loading">메시지 불러오는 중...</div>
+            </div>
+        </div>
+
+        <div class="creator-info">
+            <div class="title">✨ 우리 반 마음 프로젝트 · 2025</div>
+            <div class="details">기획·개발 남소영 | Made with 💜 for mental wellness</div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEYS = {
+            VISIT_DATA: 'visitData',
+            DAILY_ANSWER: 'dailyAnswer',
+            BROWSER_ID: 'browserId'
+        };
+
+        function getBrowserId() {
+            let browserId = localStorage.getItem(STORAGE_KEYS.BROWSER_ID);
+            if (!browserId) {
+                browserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem(STORAGE_KEYS.BROWSER_ID, browserId);
+            }
+            return browserId;
+        }
+
+        const prescriptions = {
+            sunny: {
+                title: "☀️ 에너지 넘치는 당신",
+                message: "멋진 하루네요! 이 긍정적인 에너지를 친구들과 나눠보는 건 어떨까요?",
+                activities: [
+                    "친구에게 먼저 웃으며 인사하기",
+                    "좋아하는 노래 들으며 가볍게 스트레칭",
+                    "오늘 기분 좋았던 순간 3가지 메모하기",
+                    "감사한 일을 하나 떠올려보기"
+                ]
+            },
+            cloudy: {
+                title: "⛅ 조금 지친 당신",
+                message: "괜찮아요. 잠깐 쉬어가도 돼요. 무리하지 마세요.",
+                activities: [
+                    "창문 밖 하늘 보며 깊게 숨쉬기 3회",
+                    "따뜻한 차나 물 한 잔 천천히 마시기",
+                    "5분만 눈 감고 아무 생각 안 하기",
+                    "가벼운 목과 어깨 스트레칭"
+                ]
+            },
+            overcast: {
+                title: "☁️ 힘든 하루를 보내는 당신",
+                message: "지금 충분히 잘하고 있어요. 오늘 하루 버틴 것만으로도 대단해요.",
+                activities: [
+                    "좋아하는 노래 1~2곡 듣기",
+                    "신뢰하는 친구에게 '힘들다' 한마디 보내기",
+                    "잠깐이라도 혼자만의 시간 갖기",
+                    "따뜻한 물로 세수하기"
+                ]
+            },
+            rainy: {
+                title: "🌧️ 많이 힘든 당신",
+                message: "정말 힘들었겠어요. 혼자가 아니에요. 괜찮아질 거예요.",
+                activities: [
+                    "가장 편한 사람과 대화하기",
+                    "편안한 음악 들으며 간단히 일기 쓰기",
+                    "오늘은 일찍 쉬기",
+                    "내일 아침에 먹고 싶은 것 생각해보기"
+                ]
+            },
+            stormy: {
+                title: "⛈️ 지금 당장 도움이 필요한 당신",
+                message: "혼자 견디지 마세요. 주변에 도움을 요청해도 괜찮아요.",
+                activities: [
+                    "🚨 가장 믿을 수 있는 사람에게 연락하기",
+                    "🏥 학교 상담실 방문하기",
+                    "📞 청소년 상담전화 1388",
+                    "☎️ 정신건강 위기상담 1577-0199"
+                ]
+            }
+        };
+
+        const dailyQuestions = [
+            { question: "요즘 가장 듣고 싶은 말은?", options: ["고생했어", "잘하고 있어", "괜찮아", "힘내!", "네 편이야"] },
+            { question: "지금 가장 하고 싶은 것은?", options: ["푹 자기", "맛있는 것 먹기", "친구랑 놀기", "혼자 있기", "운동하기"] },
+            { question: "스트레스 받을 때 나는?", options: ["음악 듣기", "운동하기", "잠자기", "먹기", "게임하기"] },
+            { question: "지금 가장 필요한 것은?", options: ["휴식", "격려", "공감", "조언", "혼자만의 시간"] },
+            { question: "힘들 때 가장 위로되는 것은?", options: ["친구의 위로", "좋아하는 음악", "맛있는 음식", "숙면", "산책"] },
+            { question: "주말에 가장 하고 싶은 것은?", options: ["늦잠 자기", "친구 만나기", "집에만 있기", "나들이", "취미생활"] },
+            { question: "내가 가장 행복한 순간은?", options: ["친구랑 있을 때", "혼자 쉴 때", "좋아하는 것 할 때", "성취감 느낄 때", "맛있는 것 먹을 때"] }
+        ];
+
+      const questionAnalysis = {
+            "요즘 가장 듣고 싶은 말은?": {
+                "고생했어": { message: "인정받고 싶은 마음이 크네요", advice: ["자신에게 '오늘도 고생했어' 말해주기", "작은 성취에도 스스로 칭찬하기"] },
+                "잘하고 있어": { message: "지금 조금 불안한가봐요", advice: ["지금까지 잘 해왔다는 것 인정하기", "완벽하지 않아도 괜찮아요"] },
+                "괜찮아": { message: "위로가 필요한 순간이네요", advice: ["힘든 감정을 억누르지 말고 표현하기", "믿을 수 있는 사람과 대화하기"] },
+                "힘내!": { message: "지쳐있지만 포기하고 싶지 않은 마음", advice: ["잠깐 쉬어가도 괜찮아요", "무리하지 말고 천천히"] },
+                "네 편이야": { message: "외롭고 혼자라는 느낌이 드나봐요", advice: ["주변 사람들과 가벼운 대화 시도하기", "당신은 혼자가 아니에요"] }
+            },
+            "지금 가장 하고 싶은 것은?": {
+                "푹 자기": { message: "많이 피곤한가봐요", advice: ["충분한 수면 취하기", "오늘은 일찍 자기"] },
+                "맛있는 것 먹기": { message: "작은 행복이 필요한 순간", advice: ["좋아하는 간식 먹기", "맛있는 음식으로 기분 전환"] },
+                "친구랑 놀기": { message: "사람들과의 연결이 필요해요", advice: ["친구에게 먼저 연락하기", "함께할 시간 만들기"] },
+                "혼자 있기": { message: "혼자만의 시간이 필요해요", advice: ["조용한 공간에서 쉬기", "나만의 시간 갖기"] },
+                "운동하기": { message: "에너지를 발산하고 싶은 마음", advice: ["가벼운 산책이나 스트레칭", "몸을 움직이면 기분이 좋아져요"] }
+            },
+            "스트레스 받을 때 나는?": {
+                "음악 듣기": { message: "감정을 음악으로 풀어내는 타입", advice: ["플레이리스트 만들기", "좋아하는 노래 듣기"] },
+                "운동하기": { message: "활동적으로 스트레스를 푸는 타입", advice: ["규칙적인 운동 습관 만들기", "산책이나 조깅"] },
+                "잠자기": { message: "휴식이 최우선인 타입", advice: ["충분한 수면 시간 확보", "낮잠도 좋아요"] },
+                "먹기": { message: "음식으로 위안받는 타입", advice: ["건강한 간식 선택하기", "천천히 음미하며 먹기"] },
+                "게임하기": { message: "다른 세계에서 현실 잊기", advice: ["시간 정해서 즐기기", "과몰입 주의"] }
+            },
+            "지금 가장 필요한 것은?": {
+                "휴식": { message: "지금 당장 쉬어야 해요", advice: ["모든 걸 멈추고 쉬기", "죄책감 느끼지 말기"] },
+                "격려": { message: "응원이 절실한 순간", advice: ["자신을 응원하기", "작은 성취 인정하기"] },
+                "공감": { message: "이해받고 싶은 마음", advice: ["감정 솔직하게 표현하기", "공감해줄 사람 찾기"] },
+                "조언": { message: "방향을 찾고 싶어해요", advice: ["신뢰하는 사람과 상담하기", "다양한 관점 들어보기"] },
+                "혼자만의 시간": { message: "나를 돌아볼 시간 필요", advice: ["조용한 공간 찾기", "일기 쓰기"] }
+            },
+            "힘들 때 가장 위로되는 것은?": {
+                "친구의 위로": { message: "사람과의 연결이 힘이 되는 타입", advice: ["친구와 시간 보내기", "대화 나누기"] },
+                "좋아하는 음악": { message: "음악이 치유제인 타입", advice: ["플레이리스트 만들기", "집중해서 듣기"] },
+                "맛있는 음식": { message: "음식이 위안이 되는 타입", advice: ["좋아하는 음식 먹기", "천천히 음미하기"] },
+                "숙면": { message: "잠이 최고의 치유제", advice: ["일찍 자기", "편안한 환경 만들기"] },
+                "산책": { message: "자연이 위로가 되는 타입", advice: ["규칙적으로 걷기", "야외 시간 늘리기"] }
+            },
+            "주말에 가장 하고 싶은 것은?": {
+                "늦잠 자기": { message: "평일에 많이 피곤했나봐요", advice: ["주말엔 충분히 쉬기", "수면 빚 갚기"] },
+                "친구 만나기": { message: "사회적 관계가 중요한 타입", advice: ["주말 약속 잡기", "함께 할 활동 계획하기"] },
+                "집에만 있기": { message: "집이 가장 편안한 공간", advice: ["집에서 즐길 거리 찾기", "혼자만의 시간"] },
+                "나들이": { message: "활동적인 주말 선호", advice: ["가까운 곳 여행하기", "새로운 장소 탐험"] },
+                "취미생활": { message: "자기계발이 중요한 타입", advice: ["취미에 시간 투자하기", "새로운 것 배우기"] }
+            },
+            "내가 가장 행복한 순간은?": {
+                "친구랑 있을 때": { message: "관계 지향적인 성향", advice: ["친구와 시간 많이 갖기", "소중한 사람들과 연결"] },
+                "혼자 쉴 때": { message: "내향적이고 독립적인 성향", advice: ["혼자만의 시간 확보하기", "자기 돌봄"] },
+                "좋아하는 것 할 때": { message: "열정이 행복의 원천", advice: ["좋아하는 활동 시간 늘리기", "취미 발전시키기"] },
+                "성취감 느낄 때": { message: "목표 지향적인 성향", advice: ["작은 목표 세우고 달성하기", "성취 기록하기"] },
+                "맛있는 것 먹을 때": { message: "감각적 즐거움 추구", advice: ["맛있는 음식 탐험하기", "식사 시간 소중히"] }
+            }
+        };
+
+        async function sendToGoogleSheets(action, data) {
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: action, ...data })
+                });
+                updateSyncBadge(true);
+                return true;
+            } catch (error) {
+                console.error('Google Sheets 전송 실패:', error);
+                updateSyncBadge(false);
+                return false;
+            }
+        }
+
+        async function loadStatsFromServer() {
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getStats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayStats(data.stats, data.totalParticipants);
+                    displayMessages(data.messages);
+                    updateSyncBadge(true);
+                }
+            } catch (error) {
+                console.error('통계 로드 실패:', error);
+                displayStats({ sunny: 0, cloudy: 0, overcast: 0, rainy: 0, stormy: 0 }, 0);
+                displayMessages([]);
+                updateSyncBadge(false);
+            }
+        }
+
+        async function loadQuestionStatsFromServer() {
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getQuestionStats');
+                const data = await response.json();
+                
+                if (data.success && data.questionStats && Object.keys(data.questionStats).length > 0) {
+                    return data.questionStats;
+                }
+                return null;
+            } catch (error) {
+                console.error('질문 통계 로드 실패:', error);
+                return null;
+            }
+        }
+
+        function displayStats(moodCounts, total) {
+            const moodLabels = {
+                sunny: '☀️ 맑음',
+                cloudy: '⛅ 구름 조금',
+                overcast: '☁️ 흐림',
+                rainy: '🌧️ 비',
+                stormy: '⛈️ 폭풍'
+            };
+
+            const statsHtml = Object.entries(moodLabels).map(([key, label]) => {
+                const count = moodCounts[key] || 0;
+                const percent = total > 0 ? Math.round((count / total) * 100) : 0;
+                
+                return `
+                    <div class="stat-bar">
+                        <div class="stat-label">
+                            <span>${label}</span>
+                            <span>${count}명</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: ${percent}%">
+                                ${percent}%
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('statsContainer').innerHTML = statsHtml;
+            document.getElementById('totalParticipants').textContent = total;
+        }
+
+        function displayMessages(messages) {
+            if (!messages || messages.length === 0) {
+                document.getElementById('messageList').innerHTML = 
+                    '<p style="text-align: center; color: #999; font-size: 12px;">아직 메시지가 없어요. 첫 번째 메시지를 남겨보세요!</p>';
+                return;
+            }
+
+            const messageListHtml = messages.map(msg => {
+                const time = new Date(msg.timestamp);
+                const timeStr = time.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+                
+                return `
+                    <div class="message-item">
+                        "${msg.text}"
+                        <div class="message-time">${timeStr}</div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('messageList').innerHTML = messageListHtml;
+        }
+
+        function updateSyncBadge(success) {
+            const badge = document.getElementById('syncBadge');
+            if (success) {
+                badge.textContent = '☁️동기화됨';
+                badge.classList.remove('offline');
+            } else {
+                badge.textContent = '⚠️오프라인';
+                badge.classList.add('offline');
+            }
+        }
+
+        function handleMessageKeyPress(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                submitMessage();
+            }
+        }
+
+        async function submitMessage() {
+            const input = document.getElementById('anonymousMessage');
+            const message = input.value.trim();
+
+            if (!message) {
+                alert('메시지를 입력해주세요!');
+                input.focus();
+                return;
+            }
+
+            const visitData = JSON.parse(localStorage.getItem(STORAGE_KEYS.VISIT_DATA)) || {};
+
+            await sendToGoogleSheets('saveMood', {
+                mood: null,
+                message: message,
+                streak: visitData.streak || 1,
+                totalVisits: visitData.totalVisits || 1,
+                browserId: getBrowserId()
+            });
+
+            input.value = '';
+            showSuccessMessage('successMessage');
+            
+            setTimeout(() => loadStatsFromServer(), 1000);
+        }
+
+        function showSuccessMessage(elementId) {
+            const successDiv = document.getElementById(elementId);
+            successDiv.classList.remove('hidden');
+            setTimeout(() => successDiv.classList.add('hidden'), 3000);
+        }
+
+        function updateVisitData() {
+            const today = new Date().toDateString();
+            let visitData = JSON.parse(localStorage.getItem(STORAGE_KEYS.VISIT_DATA)) || {
+                lastVisit: null,
+                streak: 0,
+                totalVisits: 0,
+                visitDates: []
+            };
+
+            if (visitData.lastVisit !== today) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toDateString();
+
+                if (visitData.lastVisit === yesterdayStr) {
+                    visitData.streak++;
+                } else if (visitData.lastVisit !== null) {
+                    visitData.streak = 1;
+                } else {
+                    visitData.streak = 1;
+                }
+
+                visitData.lastVisit = today;
+                visitData.totalVisits++;
+                visitData.visitDates.push(today);
+
+                localStorage.setItem(STORAGE_KEYS.VISIT_DATA, JSON.stringify(visitData));
+            }
+
+            document.getElementById('streakDays').textContent = visitData.streak;
+            document.getElementById('totalVisits').textContent = visitData.totalVisits;
+
+            return visitData;
+        }
+
+        async function loadDailyQuestion() {
+            const today = new Date().toDateString();
+            const savedAnswer = localStorage.getItem(STORAGE_KEYS.DAILY_ANSWER);
+            const answerData = savedAnswer ? JSON.parse(savedAnswer) : null;
+
+            const dayOfWeek = new Date().getDay();
+            const question = dailyQuestions[dayOfWeek];
+
+            document.getElementById('questionText').textContent = question.question;
+
+            if (answerData && answerData.date === today) {
+                document.getElementById('questionOptions').classList.add('hidden');
+                
+                setTimeout(async () => {
+                    const questionStats = await loadQuestionStatsFromServer();
+                    showQuestionPrescription(answerData.question, answerData.answer, questionStats);
+                }, 300);
+            } else {
+                const optionsContainer = document.getElementById('questionOptions');
+                optionsContainer.innerHTML = '';
+                optionsContainer.classList.remove('hidden');
+                
+                question.options.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.textContent = option;
+                    btn.onclick = () => answerDailyQuestion(question.question, option);
+                    optionsContainer.appendChild(btn);
+                });
+            }
+        }
+
+        // ⚡ 최적화: 분석 시간 단축 (800ms → 300ms) + 프로그레스 바
+        async function answerDailyQuestion(question, answer) {
+            const today = new Date().toDateString();
+            
+            localStorage.setItem(STORAGE_KEYS.DAILY_ANSWER, JSON.stringify({
+                date: today,
+                question: question,
+                answer: answer
+            }));
+
+            const buttons = document.getElementById('questionOptions').querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            const loadingContainer = document.getElementById('questionLoadingContainer');
+            loadingContainer.innerHTML = `
+                <div class="loading-indicator">
+                    <div class="spinner"></div>
+                    <p id="loadingText">분석 중...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+            `;
+            loadingContainer.classList.remove('hidden');
+
+            // ⚡ 프로그레스 바 애니메이션
+            const messages = [
+                { text: '감정 분석 중... 🔍', progress: 25 },
+                { text: '통계 수집 중... 📊', progress: 50 },
+                { text: '처방 준비 중... 💊', progress: 75 },
+                { text: '거의 완료! 🎉', progress: 100 }
+            ];
+
+            let step = 0;
+            const interval = setInterval(() => {
+                if (step < messages.length) {
+                    document.getElementById('loadingText').textContent = messages[step].text;
+                    document.getElementById('progressFill').style.width = messages[step].progress + '%';
+                    step++;
+                }
+            }, 75); // 75ms * 4 = 300ms
+
+            // ⚡ 병렬 처리
+            const [_, questionStats] = await Promise.all([
+                sendToGoogleSheets('saveQuestion', {
+                    question: question,
+                    answer: answer,
+                    browserId: getBrowserId()
+                }),
+                new Promise(resolve => setTimeout(async () => {
+                    resolve(await loadQuestionStatsFromServer());
+                }, 300))
+            ]);
+
+            clearInterval(interval);
+            
+            loadingContainer.classList.add('hidden');
+            document.getElementById('questionOptions').classList.add('hidden');
+            
+            showQuestionPrescription(question, answer, questionStats);
+        }
+
+
+      function showQuestionPrescription(question, answer, questionStats) {
+            const container = document.getElementById('questionResultContainer');
+            container.classList.remove('hidden');
+            
+            if (!questionStats || Object.keys(questionStats).length === 0) {
+                container.innerHTML = `
+                    <div style="background: white; padding: 12px; border-radius: 8px; margin-top: 12px;">
+                        <h4 style="color: #667eea; font-size: 13px; margin-bottom: 8px;">당신의 선택: "${answer}"</h4>
+                        <p style="font-size: 11px; color: #666;">답변이 저장되었습니다! 다른 친구들의 답변이 모이면 통계를 보여드릴게요.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const total = Object.values(questionStats).reduce((a, b) => a + b, 0);
+            const sortedStats = Object.entries(questionStats).sort((a, b) => b[1] - a[1]);
+            const topAnswer = sortedStats[0];
+            const topPercent = Math.round((topAnswer[1] / total) * 100);
+
+            const analysis = questionAnalysis[question]?.[topAnswer[0]] || {
+                message: "많은 친구들이 이 답변을 선택했어요",
+                advice: ["자신의 감정을 소중히 여기기", "필요한 것을 찾아가기"]
+            };
+
+            let html = `
+                <div class="question-prescription">
+                    <h3>📊 우리 반 마음 분석</h3>
+                    
+                    <div class="winner-badge">
+                        🏆 1위: ${topAnswer[0]} (${topPercent}%)
+                    </div>
+
+                    <div class="analysis-box">
+                        <p><strong>💭 ${total === 1 ? '당신의 선택' : '우리 반의 마음'}:</strong></p>
+                        <p>${analysis.message}</p>
+                    </div>
+
+                    <h4>📊 전체 투표 결과</h4>
+            `;
+
+            sortedStats.forEach(([opt, count], index) => {
+                const percent = Math.round((count / total) * 100);
+                const isYourChoice = opt === answer;
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '  ';
+
+                html += `
+                    <div style="background: ${isYourChoice ? '#e8f5e9' : '#f5f5f5'}; padding: 10px; margin: 6px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; border: 2px solid ${isYourChoice ? '#4CAF50' : '#ddd'};">
+                        <span style="font-weight: ${isYourChoice ? 'bold' : '500'}; color: #333;">${medal} ${opt}${isYourChoice ? ' ✓' : ''}</span>
+                        <span style="color: #f57c00; font-weight: bold;">${percent}% (${count}명)</span>
+                    </div>
+                `;
+            });
+
+            html += `
+                    <h4>💡 추천 활동</h4>
+                    <ul>
+                        ${analysis.advice.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+
+            container.innerHTML = html;
+            
+            setTimeout(() => {
+                container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        async function selectMood(mood) {
+            const visitData = JSON.parse(localStorage.getItem(STORAGE_KEYS.VISIT_DATA)) || {};
+            const buttons = document.getElementById('moodOptions').querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            await sendToGoogleSheets('saveMood', {
+                mood: mood,
+                message: '',
+                streak: visitData.streak || 1,
+                totalVisits: visitData.totalVisits || 1,
+                browserId: getBrowserId()
+            });
+
+            showPrescription(mood);
+
+            setTimeout(() => {
+                loadStatsFromServer();
+                buttons.forEach(btn => btn.disabled = false);
+            }, 1000);
+        }
+
+        function showPrescription(mood) {
+            const prescription = prescriptions[mood];
+            const container = document.getElementById('prescriptionContainer');
+            
+            let html = `
+                <div class="prescription">
+                    <h3>${prescription.title}</h3>
+                    <p>"${prescription.message}"</p>
+                    
+                    <h4>💊 오늘 추천 활동</h4>
+                    <ul>
+                        ${prescription.activities.map(activity => `<li>${activity}</li>`).join('')}
+                    </ul>
+
+                    <button class="reset-btn" onclick="resetPrescription()">🔄 다시 체크하기</button>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            container.classList.remove('hidden');
+            
+            setTimeout(() => {
+                container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        function resetPrescription() {
+            document.getElementById('prescriptionContainer').classList.add('hidden');
+            document.getElementById('prescriptionContainer').innerHTML = '';
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function loadPersonalChart() {
+            const browserId = getBrowserId();
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getPersonalHistory&browserId=' + browserId);
+                const data = await response.json();
+                
+                if (data.success && data.history && data.history.length >= 3) {
+                    document.getElementById('chartSection').style.display = 'block';
+                    displayPersonalChart(data.history);
+                    loadClassTrend();
+                }
+            } catch (error) {
+                console.error('차트 로드 실패:', error);
+            }
+        }
+
+        function displayPersonalChart(history) {
+            const moodLabels = {
+                sunny: '☀️ 맑음',
+                cloudy: '⛅ 구름 조금',
+                overcast: '☁️ 흐림',
+                rainy: '🌧️ 비',
+                stormy: '⛈️ 폭풍'
+            };
+            
+            const moodColors = {
+                sunny: '#FFD700',
+                cloudy: '#87CEEB',
+                overcast: '#B0C4DE',
+                rainy: '#4682B4',
+                stormy: '#2F4F4F'
+            };
+            
+            let html = '<div style="max-height: 200px; overflow-y: auto;">';
+            
+            history.forEach(record => {
+                const mood = record.mood;
+                const date = new Date(record.date).toLocaleDateString('ko-KR', { 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                
+                html += `
+                    <div class="mood-chart-bar">
+                        <div class="mood-chart-label">
+                            <span>${date}</span>
+                            <span>${moodLabels[mood]}</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 100%; background: ${moodColors[mood]};">
+                                ${moodLabels[mood]}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            document.getElementById('personalChart').innerHTML = html;
+        }
+
+        async function loadClassTrend() {
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getClassTrend&days=7');
+                const data = await response.json();
+                
+                if (data.success && data.trend) {
+                    displayClassTrend(data.trend);
+                }
+            } catch (error) {
+                console.error('트렌드 로드 실패:', error);
+            }
+        }
+
+        function displayClassTrend(trend) {
+            const moodLabels = {
+                sunny: '☀️ 맑음',
+                cloudy: '⛅ 구름 조금',
+                overcast: '☁️ 흐림',
+                rainy: '🌧️ 비',
+                stormy: '⛈️ 폭풍'
+            };
+            
+            let html = '<div style="background: white; padding: 15px; border-radius: 10px;">';
+            
+            trend.forEach(day => {
+                const date = new Date(day.date).toLocaleDateString('ko-KR', { 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                
+                const total = day.total;
+                const moods = ['sunny', 'cloudy', 'overcast', 'rainy', 'stormy'];
+                const maxMood = moods.reduce((max, mood) => 
+                    day[mood] > day[max] ? mood : max, 'sunny'
+                );
+                
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0;">
+                        <span style="font-size: 13px; color: #666;">${date}</span>
+                        <span style="font-size: 16px;">${moodLabels[maxMood]}</span>
+                        <span style="font-size: 12px; color: #999;">${total}명</span>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            document.getElementById('classTrendChart').innerHTML = html;
+        }
+
+        async function loadWeeklyReport() {
+            const browserId = getBrowserId();
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getWeeklyReport&browserId=' + browserId);
+                const data = await response.json();
+                
+                if (data.success && data.report.personal.totalDays >= 3) {
+                    document.getElementById('reportSection').style.display = 'block';
+                    displayReport(data.report);
+                }
+            } catch (error) {
+                console.error('리포트 로드 실패:', error);
+            }
+        }
+
+        function displayReport(report) {
+            const moodLabels = {
+                sunny: '☀️ 맑음',
+                cloudy: '⛅ 구름 조금',
+                overcast: '☁️ 흐림',
+                rainy: '🌧️ 비',
+                stormy: '⛈️ 폭풍'
+            };
+            
+            const personal = report.personal;
+            const classData = report.class;
+            
+            let html = `
+                <div class="report-card">
+                    <h4>📊 나의 이번 주 기록</h4>
+                    <div class="report-stat">${personal.totalDays}일 참여</div>
+                    <div class="report-desc">
+                        가장 많이 느낀 감정: <strong>${moodLabels[personal.mostFrequent]}</strong><br>
+                        ${personal.totalDays >= 5 ? '✨ 꾸준히 잘 참여하고 있어요!' : '💪 더 자주 기록해보세요!'}
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <h4>👥 우리 반 이번 주</h4>
+                    <div class="report-stat">${classData.uniqueParticipants}명 참여</div>
+                    <div class="report-desc">
+                        총 ${classData.totalRecords}회 기록<br>
+                        우리 반의 주된 감정: <strong>${moodLabels[classData.mostFrequent]}</strong>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('reportContent').innerHTML = html;
+        }
+
+        function downloadReport() {
+            alert('리포트 다운로드 기능은 추후 업데이트 예정입니다!');
+        }
+
+        // ⚡ 최적화: 병렬 초기화 (순차 → 동시 처리)
+        async function init() {
+            updateVisitData();
+            
+            // ⚡ 병렬 처리로 속도 향상
+            await Promise.all([
+                loadDailyQuestion(),
+                loadStatsFromServer()
+            ]);
+            
+            // ⚡ 차트/리포트는 1초 후 로드 (2초 → 1초 단축)
+            setTimeout(() => {
+                loadPersonalChart();
+                loadWeeklyReport();
+            }, 1000);
+        }
+
+        init();
+    </script>
+</body>
+</html>
+
+
+      
+      
+      
